@@ -1493,27 +1493,30 @@ function renderGuide(){
 
 /* =====================================================================
    7) CLOUD-SYNC — gleicher Lernstand auf allen Geräten
-   Ablage als JSON-Dokument bei jsonblob.com (kostenlos, ohne Konto).
-   - "Aktivieren" legt ein Cloud-Dokument an → dessen ID ist der SYNC-CODE
-   - Den Code auf einem zweiten Gerät eingeben → beide Geräte teilen
-     denselben Stand
-   - Automatik: Pull beim Start, Push gebündelt nach Antworten und beim
-     Verlassen der App
+   Backend: ein PRIVATES GitHub-Gist (api.github.com, CORS-frei).
+   Einmalig nötig: ein GitHub-Token mit NUR dem "gist"-Scope.
+   - "Mit GitHub verbinden" sucht ein vorhandenes Lernstand-Gist unter
+     deinem Konto oder legt eines an
+   - Zweites Gerät: einfach DASSELBE Token einfügen – das Gist wird
+     automatisch gefunden, kein Sync-Code nötig
+   - Automatik: Pull beim Start, gebündelter Push nach Antworten und
+     beim Verlassen der App
    - Konfliktlösung: der Stand mit dem NEUEREN lastChange gewinnt
-   Hinweis: Der Sync-Code wirkt wie ein Passwort — wer ihn kennt, kann
-   den Lernstand lesen. Es werden nur Vokabel-Lerndaten übertragen.
+   Hinweis: Das Token wirkt wie ein Passwort für deine Gists — nur
+   selbst verwenden, niemandem schicken.
 ===================================================================== */
 const SYNC = {
-  API: "https://jsonblob.com/api/jsonBlob",
-  KEY: "fr7-sync-v1",
-  cfg: { id: null, lastSync: 0 },
+  API: "https://api.github.com",
+  FILE: "fr7-lernstand.json",
+  KEY: "fr7-sync-v2",
+  cfg: { token:null, gistId:null, lastSync:0, collapsed:true },
   dirty: false,
   busy: false,
   lastError: null,
 
   init(){
     try { const raw = localStorage.getItem(this.KEY); if (raw) this.cfg = JSON.parse(raw); } catch(e) {}
-    if (this.cfg.collapsed === undefined) this.cfg.collapsed = true;   // standardmäßig eingeklappt
+    if (this.cfg.collapsed === undefined) this.cfg.collapsed = true;
     const toggle = document.getElementById("syncToggle");
     toggle.addEventListener("click", () => {
       this.cfg.collapsed = !this.cfg.collapsed;
@@ -1521,7 +1524,7 @@ const SYNC = {
     });
     this.applyCollapsed();
     this.renderBox();
-    if (this.cfg.id) this.pull();                       // beim Start: Cloud-Stand holen
+    if (this.ready()) this.pull();                      // beim Start: Cloud-Stand holen
     setInterval(() => this.flush(), 30000);             // gebündelter Auto-Push
     document.addEventListener("visibilitychange", () => {
       if (document.visibilityState === "hidden") this.flush(true);
@@ -1534,115 +1537,144 @@ const SYNC = {
   },
   save(){ try { localStorage.setItem(this.KEY, JSON.stringify(this.cfg)); } catch(e) {} },
   markDirty(){ this.dirty = true; },
-
+  ready(){ return !!(this.cfg.token && this.cfg.gistId); },
+  headers(){
+    return {
+      "Authorization": "Bearer " + this.cfg.token,
+      "Accept": "application/vnd.github+json",
+      "Content-Type": "application/json"
+    };
+  },
   payload(){
-    return JSON.stringify({ app:"fr7-vacation-trainer", version:3, updatedAt:Date.now(), state });
+    return JSON.stringify({ app:"fr7-vacation-trainer", version:4, updatedAt:Date.now(), state });
+  },
+  fail(e){
+    if (e instanceof TypeError) {
+      this.lastError = "Netzwerkfehler: " + (e.message || "Verbindung fehlgeschlagen") +
+        " – offline oder Content-Blocker aktiv (api.github.com freigeben).";
+    } else {
+      this.lastError = e && e.message ? e.message : "Unbekannter Fehler.";
+    }
+  },
+
+  askToken(){
+    const t = prompt(
+      "GitHub-Token einfügen (beginnt mit ghp_…)\n\n" +
+      "Einmalig so erstellen:\n" +
+      "1. github.com → Profilbild → Settings\n" +
+      "2. Ganz unten: Developer settings\n" +
+      "3. Personal access tokens → Tokens (classic)\n" +
+      "4. Generate new token (classic)\n" +
+      "5. Haken NUR bei „gist\" setzen, Ablauf z. B. 1 Jahr\n" +
+      "6. Generate token → Token kopieren und hier einfügen"
+    );
+    return t ? t.trim() : null;
   },
 
   async enable(){
     if (this.busy) return;
-    // Häufigste Ursache: App als lokale Datei geöffnet → Browser blockiert Cloud-Zugriffe
-    if (location.protocol === "file:") {
-      this.lastError = "Die App läuft als lokale Datei (file://) – viele Browser blockieren " +
-        "dann Cloud-Zugriffe. Lösung: App über eine https-Adresse öffnen (z. B. GitHub Pages) " +
-        "oder den Sync-Code manuell anlegen (siehe Hinweis unten).";
-      this.renderBox(); return;
-    }
-    this.busy = true; this.lastError = null; this.renderBox("Cloud-Dokument wird angelegt…");
+    const token = this.askToken();
+    if (!token) return;
+    this.busy = true; this.lastError = null; this.renderBox("Verbinde mit GitHub…");
     try {
-      const res = await fetch(this.API, {
-        method:"POST", headers:{ "Content-Type":"application/json", "Accept":"application/json" },
-        body: this.payload()
-      });
-      if (!res.ok) throw new Error("Server antwortet mit HTTP " + res.status + " " + (res.statusText||""));
-      const loc = res.headers.get("Location") || res.headers.get("X-jsonblob") || "";
-      const id = loc.split("/").pop();
-      if (!id) throw new Error("NO_ID");
-      this.cfg.id = id; this.cfg.lastSync = Date.now();
-      this.save(); this.dirty = false;
-    } catch(e) {
-      if (e && e.message === "NO_ID") {
-        this.lastError = "Das Cloud-Dokument wurde zwar angelegt, aber der Browser durfte die " +
-          "Dokument-ID nicht lesen (CORS). Nutze bitte den manuellen Weg unten.";
-      } else if (e instanceof TypeError) {
-        this.lastError = "Netzwerkfehler: " + (e.message || "Verbindung fehlgeschlagen") +
-          " – offline, Werbeblocker/Content-Blocker aktiv, oder jsonblob.com nicht erreichbar.";
+      this.cfg.token = token;
+      // 1) Gibt es unter diesem Konto schon einen Lernstand (z. B. vom anderen Gerät)?
+      const found = await this.findGist();
+      if (found) {
+        this.cfg.gistId = found.id; this.save();
+        await this.pullInner();                          // Abgleich (neuerer Stand gewinnt)
       } else {
-        this.lastError = "Aktivierung fehlgeschlagen: " + (e && e.message ? e.message : "unbekannter Fehler");
+        // 2) Neues PRIVATES Gist anlegen
+        const res = await fetch(this.API + "/gists", {
+          method:"POST", headers: this.headers(),
+          body: JSON.stringify({
+            description: "Französisch-Trainer – Lernstand (automatisch verwaltet)",
+            public: false,
+            files: { [this.FILE]: { content: this.payload() } }
+          })
+        });
+        if (res.status === 401) throw new Error("Token ungültig oder abgelaufen (HTTP 401).");
+        if (res.status === 403) throw new Error("Token hat nicht den „gist\"-Scope (HTTP 403) – beim Erstellen den Haken bei „gist\" setzen.");
+        if (!res.ok) throw new Error("GitHub antwortet mit HTTP " + res.status);
+        const gist = await res.json();
+        this.cfg.gistId = gist.id;
+        this.dirty = false;
       }
+      this.cfg.lastSync = Date.now(); this.save();
+    } catch(e) {
+      this.fail(e);
+      if (!this.cfg.gistId) this.cfg.token = null;       // halbe Einrichtung nicht speichern
+      this.save();
     }
     this.busy = false; this.renderBox();
   },
 
-  async linkExisting(){
-    const code = prompt("Sync-Code vom anderen Gerät eingeben:");
-    if (!code) return;
-    const id = code.trim().split("/").pop();
-    this.busy = true; this.lastError = null; this.renderBox("Verbinde…");
-    try {
-      const res = await fetch(this.API + "/" + encodeURIComponent(id), { headers:{ "Accept":"application/json" } });
-      if (res.status === 404) throw new Error("Unter diesem Code existiert kein Cloud-Dokument (Tippfehler?).");
-      if (!res.ok) throw new Error("Server antwortet mit HTTP " + res.status);
-      const remote = await res.json();
-      this.cfg.id = id; this.cfg.lastSync = Date.now(); this.save();
-      if (remote && remote.state && Array.isArray(remote.state.cards)) {
-        this.adoptIfNewer(remote);          // echter Lernstand → normaler Abgleich
-      } else {
-        this.dirty = true; await this.flush(); // frisch/manuell angelegter Blob → lokalen Stand hochladen
-      }
-    } catch(e) {
-      this.lastError = (e instanceof TypeError)
-        ? "Netzwerkfehler – offline, Content-Blocker aktiv oder Dienst nicht erreichbar."
-        : (e && e.message ? e.message : "Code ungültig oder Dienst nicht erreichbar.");
+  async findGist(){
+    const res = await fetch(this.API + "/gists?per_page=100", { headers: this.headers() });
+    if (res.status === 401) throw new Error("Token ungültig oder abgelaufen (HTTP 401).");
+    if (!res.ok) throw new Error("GitHub antwortet mit HTTP " + res.status);
+    const list = await res.json();
+    return (Array.isArray(list) ? list : []).find(g => g.files && g.files[this.FILE]) || null;
+  },
+
+  async pullInner(){
+    const res = await fetch(this.API + "/gists/" + this.cfg.gistId, { headers: this.headers() });
+    if (res.status === 404) throw new Error("Das Lernstand-Gist existiert nicht mehr (gelöscht?). Sync trennen und neu verbinden.");
+    if (res.status === 401) throw new Error("Token ungültig oder abgelaufen (HTTP 401).");
+    if (!res.ok) throw new Error("GitHub antwortet mit HTTP " + res.status);
+    const gist = await res.json();
+    const f = gist.files && gist.files[this.FILE];
+    if (!f) throw new Error("Im Gist fehlt die Datei " + this.FILE);
+    let text = f.content;
+    if (f.truncated && f.raw_url) {                      // Sicherheitsnetz bei sehr großen Ständen
+      const raw = await fetch(f.raw_url);
+      text = await raw.text();
     }
-    this.busy = false; this.renderBox();
+    const remote = JSON.parse(text);
+    this.adoptIfNewer(remote);
   },
 
   adoptIfNewer(remote){
-    const remoteChange = (remote.state && remote.state.lastChange) || remote.updatedAt || 0;
-    if (remoteChange > (state.lastChange || 0)) {
+    const remoteChange = (remote && remote.state && remote.state.lastChange) || (remote && remote.updatedAt) || 0;
+    if (remote && remote.state && Array.isArray(remote.state.cards) && remoteChange > (state.lastChange || 0)) {
       state = migrate(remote.state);
       saveState(); renderAll(); updateBackupStatus();
     } else if ((state.lastChange || 0) > remoteChange) {
-      this.dirty = true; this.flush();                  // lokal ist neuer → hochladen
+      this.dirty = true;                                  // lokal ist neuer → hochladen
     }
   },
 
   async pull(){
-    if (!this.cfg.id || this.busy) return;
+    if (!this.ready() || this.busy) return;
     this.busy = true; this.renderBox("Synchronisiere…");
     try {
-      const res = await fetch(this.API + "/" + this.cfg.id, { headers:{ "Accept":"application/json" } });
-      if (!res.ok) throw new Error("HTTP " + res.status);
-      const remote = await res.json();
-      this.adoptIfNewer(remote);
+      await this.pullInner();
       this.cfg.lastSync = Date.now(); this.save(); this.lastError = null;
-    } catch(e) {
-      this.lastError = "Cloud nicht erreichbar – es gilt der lokale Stand.";
-    }
+    } catch(e) { this.fail(e); }
     this.busy = false; this.renderBox();
+    if (this.dirty) this.flush();
   },
 
   async flush(useKeepalive){
-    if (!this.cfg.id || !this.dirty || this.busy) return;
+    if (!this.ready() || !this.dirty || this.busy) return;
     this.busy = true;
     try {
-      const res = await fetch(this.API + "/" + this.cfg.id, {
-        method:"PUT", headers:{ "Content-Type":"application/json", "Accept":"application/json" },
-        body: this.payload(),
+      const res = await fetch(this.API + "/gists/" + this.cfg.gistId, {
+        method:"PATCH", headers: this.headers(),
+        body: JSON.stringify({ files: { [this.FILE]: { content: this.payload() } } }),
         keepalive: !!useKeepalive
       });
-      if (!res.ok) throw new Error("HTTP " + res.status);
+      if (res.status === 401) throw new Error("Token ungültig oder abgelaufen (HTTP 401).");
+      if (!res.ok) throw new Error("Upload fehlgeschlagen (HTTP " + res.status + ") – wird automatisch erneut versucht.");
       this.dirty = false; this.cfg.lastSync = Date.now(); this.save(); this.lastError = null;
-    } catch(e) {
-      this.lastError = "Upload fehlgeschlagen – wird automatisch erneut versucht.";
-    }
+    } catch(e) { this.fail(e); }
     this.busy = false; this.renderBox();
   },
 
   unlink(){
-    if (!confirm("Cloud-Sync auf DIESEM Gerät trennen? (Das Cloud-Dokument und andere Geräte bleiben unberührt.)")) return;
-    this.cfg = { id:null, lastSync:0, collapsed:this.cfg.collapsed }; this.save(); this.renderBox();
+    if (!confirm("Cloud-Sync auf DIESEM Gerät trennen? (Das Gist bei GitHub und andere Geräte bleiben unberührt.)")) return;
+    this.cfg = { token:null, gistId:null, lastSync:0, collapsed:this.cfg.collapsed };
+    this.save(); this.lastError = null; this.renderBox();
   },
 
   renderBox(statusOverride){
@@ -1651,54 +1683,34 @@ const SYNC = {
     const summary = document.getElementById("syncSummary");
     if (!body) return;
 
-    // Kopfzeile (immer sichtbar, auch eingeklappt)
-    dot.className = "sync-dot " + (this.lastError ? "err" : this.cfg.id ? "on" : "");
-    summary.textContent = this.lastError ? "Fehler" :
-                          this.cfg.id ? "aktiv" : "aus";
+    dot.className = "sync-dot " + (this.lastError ? "err" : this.ready() ? "on" : "");
+    summary.textContent = this.lastError ? "Fehler" : this.ready() ? "aktiv" : "aus";
 
-    if (!this.cfg.id) {
+    if (!this.ready()) {
       body.innerHTML = `
         <div class="backup-row">
-          <button class="backup-btn" id="syncEnableBtn">☁️ Auf diesem Gerät aktivieren</button>
-        </div>
-        <div style="text-align:center;margin-top:4px">
-          <button class="link-btn" id="syncLinkBtn">Ich habe schon einen Sync-Code</button>
+          <button class="backup-btn" id="syncEnableBtn">🐙 Mit GitHub verbinden</button>
         </div>
         <div class="sync-status-line ${this.lastError?"err":""}">${statusOverride || this.lastError ||
-          "Gleicher Lernstand auf iPhone, PC & Co. – ohne Konto."}</div>
-        ${this.lastError ? `
-        <div class="sync-status-line" style="margin-top:8px;text-align:left">
-          <b>Manueller Weg (funktioniert immer):</b> 1. Öffne <b>jsonblob.com</b> im Browser ·
-          2. Tippe dort auf „Save" · 3. Kopiere die lange Zahl aus der Adresszeile
-          (jsonblob.com/<b>123456…</b>) · 4. Füge sie hier über
-          „Ich habe schon einen Sync-Code" ein. Hinweis: Das klappt erst, wenn der Blob
-          gültiges JSON enthält – der vorausgefüllte Beispiel-Inhalt reicht; deine App
-          überschreibt ihn beim ersten Sync automatisch.</div>` : ``}`;
+          "Gleicher Lernstand auf iPhone, PC & Co. – gespeichert in einem privaten GitHub-Gist. " +
+          "Du brauchst nur dein GitHub-Konto und einmalig ein Token (Anleitung erscheint beim Verbinden)."}</div>`;
       document.getElementById("syncEnableBtn").addEventListener("click", () => this.enable());
-      document.getElementById("syncLinkBtn").addEventListener("click", () => this.linkExisting());
     } else {
       const mins = this.cfg.lastSync ? Math.round((Date.now()-this.cfg.lastSync)/60000) : null;
       const when = mins === null ? "–" : mins < 1 ? "gerade eben" :
                    mins < 60 ? `vor ${mins} Min.` : `vor ${Math.round(mins/60)} Std.`;
       summary.textContent = this.lastError ? "Fehler" : `synchron · ${when}`;
       body.innerHTML = `
-        <span class="sync-code" id="syncCodeEl" title="Tippen zum Kopieren">${esc(this.cfg.id)}</span>
+        <span class="sync-code" title="Gist-ID (nur zur Info)">Gist: ${esc(this.cfg.gistId)}</span>
         <div class="backup-row">
           <button class="backup-btn" id="syncNowBtn">🔄 Jetzt synchronisieren</button>
           <button class="backup-btn" id="syncUnlinkBtn">✂️ Trennen</button>
         </div>
         <div class="sync-status-line ${this.lastError?"err":""}">${statusOverride || this.lastError ||
-          `Zuletzt synchronisiert: ${when} · Diesen Code am anderen Gerät unter
-           „Ich habe schon einen Sync-Code" eingeben.`}</div>`;
-      document.getElementById("syncNowBtn").addEventListener("click", async () => { await this.flush(); await this.pull(); });
+          `Zuletzt synchronisiert: ${when} · Anderes Gerät koppeln: dort „Mit GitHub verbinden" tippen
+           und DASSELBE Token einfügen – der Lernstand wird automatisch gefunden.`}</div>`;
+      document.getElementById("syncNowBtn").addEventListener("click", async () => { this.dirty = true; await this.flush(); await this.pull(); });
       document.getElementById("syncUnlinkBtn").addEventListener("click", () => this.unlink());
-      document.getElementById("syncCodeEl").addEventListener("click", () => {
-        const codeEl = document.getElementById("syncCodeEl");
-        const done = () => { codeEl.textContent = "✔ Kopiert!"; setTimeout(() => this.renderBox(), 1200); };
-        if (navigator.clipboard && navigator.clipboard.writeText) {
-          navigator.clipboard.writeText(this.cfg.id).then(done, done);
-        } else done();
-      });
     }
   }
 };
