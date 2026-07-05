@@ -1191,6 +1191,8 @@ function migrate(s){
     s.newToday = {}; Object.keys(DECKS).forEach(k => s.newToday[k] = 0);
     if (typeof s.newIntroducedToday === "number") s.newToday.urlaub = s.newIntroducedToday;
   }
+  // Später hinzugekommene Stapel: fehlende Tageszähler nachrüsten
+  Object.keys(DECKS).forEach(k => { if (typeof s.newToday[k] !== "number") s.newToday[k] = 0; });
   if (!s.activeDeck || !DECKS[s.activeDeck]) s.activeDeck = "urlaub";
   if (!s.view) s.view = "learn";
   if (!s.log) s.log = {};
@@ -1249,7 +1251,7 @@ function nextCard(deck){
   rollover();
   const due = dueReviews(deck);
   if (due.length) return { card: due[0], isNew:false };
-  if (state.newToday[deck] < DECKS[deck].newPerDay) {
+  if ((state.newToday[deck] || 0) < DECKS[deck].newPerDay) {
     const fresh = newAvailable(deck);
     if (fresh.length) return { card: fresh[0], isNew:true };
   }
@@ -1369,7 +1371,7 @@ function grade(q){
   if ("speechSynthesis" in window) speechSynthesis.cancel();
   const c = current.card;
   const deck = c.deck;
-  if (!c.seen) { c.seen = true; state.newToday[deck] += 1; }
+  if (!c.seen) { c.seen = true; state.newToday[deck] = (state.newToday[deck] || 0) + 1; }
   sm2(c, q);
   // Lern-Protokoll für die Statistik
   const k = dateKey();
@@ -1401,7 +1403,7 @@ function renderDone(deck){
       Wiederholungen festigen dein Gedächtnis. Du kannst auch zu einem
       anderen Stapel wechseln – das ist echtes Interleaving.</p>
       <div class="next-due">${nextTxt}</div>
-      ${freshLeft > 0 && state.newToday[deck] >= DECKS[deck].newPerDay
+      ${freshLeft > 0 && (state.newToday[deck] || 0) >= DECKS[deck].newPerDay
         ? `<button class="ghost-btn" id="aheadBtn">+10 neue Karten vorziehen</button>` : ``}
       ${state.reviewsSinceExport >= 25
         ? `<div class="backup-warning">💾 ${state.reviewsSinceExport} Antworten seit der letzten
@@ -1423,7 +1425,7 @@ function updateHeader(){
   const solid = cards.filter(c => c.repetition >= 2).length;
   const ready = cards.length ? Math.round((solid/cards.length)*100) : 0;
   const due = dueReviews(deck).length;
-  const newLeft = Math.max(0, Math.min(d.newPerDay - state.newToday[deck], newAvailable(deck).length));
+  const newLeft = Math.max(0, Math.min(d.newPerDay - (state.newToday[deck] || 0), newAvailable(deck).length));
   document.getElementById("progressFill").style.width = ready + "%";
   document.getElementById("readyLabel").textContent = `${ready} % ${d.ready}`;
   document.getElementById("dueLabel").textContent = due > 0 ? due + " fällig" : "";
