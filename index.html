@@ -149,6 +149,31 @@
   .tip{background:#EDF0F9;border:1px solid #D6DCF0;border-radius:10px;padding:10px 12px;
        font-size:.78rem;line-height:1.5;margin-top:10px;color:var(--bleu-dark);font-weight:600}
 
+  /* ---------- Konversations-Simulator ---------- */
+  .convo-launch-btn{
+    width:100%;margin:0 0 12px;padding:11px;border:1.5px dashed var(--bleu);
+    background:#EDF0F9;color:var(--bleu-dark);border-radius:12px;
+    font-weight:800;font-size:.85rem;cursor:pointer;transition:transform .1s ease;
+  }
+  .convo-launch-btn:active{transform:scale(.98)}
+  .convo-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+  .convo-head h3{margin:0;font-size:.95rem}
+  .bubble{max-width:88%;padding:10px 14px;border-radius:16px;font-weight:700;font-size:.9rem;line-height:1.4}
+  .bubble.q{align-self:flex-start;background:var(--bg);border:1px solid var(--line);border-bottom-left-radius:4px}
+  .bubble.a{align-self:flex-end;background:var(--bleu);color:#fff;border-bottom-right-radius:4px}
+  .bubble .sub{display:block;font-weight:600;font-size:.68rem;color:var(--muted);margin-top:4px}
+  .bubble .subphon{font-family:"SF Mono",ui-monospace,Menlo,Consolas,monospace;color:var(--rouge);font-size:.68rem}
+  .bubble.a .sub{color:#C9D4EE}
+  .convo-opts{display:flex;flex-direction:column;gap:8px;margin-top:12px}
+  .convo-opt{
+    text-align:left;background:var(--card);border:1.5px solid var(--bleu);color:var(--bleu-dark);
+    border-radius:12px;padding:11px 13px;font-weight:800;font-size:.88rem;cursor:pointer;
+    line-height:1.35;transition:transform .1s ease;
+  }
+  .convo-opt:active{transform:scale(.98)}
+  .convo-opt small{display:block;font-weight:600;color:var(--muted);font-size:.68rem;margin-top:2px}
+  .convo-opt .known{color:var(--vert);font-size:.64rem;font-weight:800;margin-left:6px}
+
   /* ---------- Sicherung ---------- */
   .backup{margin-top:18px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px}
   .backup-row{display:flex;gap:8px}
@@ -217,6 +242,8 @@
     <div class="stat"><b id="statNew">0</b><span>Neu heute</span></div>
     <div class="stat"><b id="statLearned">0</b><span>Gefestigt</span></div>
   </div>
+
+  <div id="convoLaunch" style="display:none"></div>
 
   <div class="stage" id="stage"></div>
   <div class="controls" id="controls"></div>
@@ -1185,6 +1212,200 @@ const SEED = [
 ];
 
 /* =====================================================================
+   1b) KONVERSATIONS-SIMULATOR — geskriptete Dialoge pro Stapel
+   Aufbau: pro Stapel ein realistisches Szenario. Jede Stufe = eine
+   Frage (fr/phon/de) + 3 realistische Antwortoptionen. Die Optionen
+   werden zur Laufzeit danach sortiert, wie viele ihrer Wörter du in
+   den Karten schon KENNENGELERNT hast (✓ bekannt).
+===================================================================== */
+const DIALOGUES = {
+  urlaub: { title:"Im Restaurant", steps:[
+    { q:{fr:"Bonsoir ! Vous avez réservé ?",phon:"bong-ßo-ar! wu-sa-we re-ßär-we",de:"Guten Abend! Haben Sie reserviert?"},
+      opts:[
+        {fr:"Oui, j'ai réservé au nom de Georgios.",de:"Ja, ich habe auf den Namen Georgios reserviert."},
+        {fr:"Non, une table pour deux, s'il vous plaît.",de:"Nein, einen Tisch für zwei, bitte."},
+        {fr:"Non… c'est possible sans réservation ?",de:"Nein… geht es ohne Reservierung?"}]},
+    { q:{fr:"Très bien. En terrasse ou à l'intérieur ?",phon:"trä bjäng. ang tä-rass u a läng-te-rjör",de:"Sehr gern. Auf der Terrasse oder drinnen?"},
+      opts:[
+        {fr:"En terrasse, s'il vous plaît.",de:"Auf der Terrasse, bitte."},
+        {fr:"À l'intérieur, s'il vous plaît.",de:"Drinnen, bitte."},
+        {fr:"Ça m'est égal, merci.",de:"Das ist mir egal, danke."}]},
+    { q:{fr:"Voici la carte. Vous voulez boire quelque chose ?",phon:"wo-a-ßi la kart. wu wu-le bo-ar käl-kö schos",de:"Hier ist die Karte. Möchten Sie etwas trinken?"},
+      opts:[
+        {fr:"De l'eau gazeuse, s'il vous plaît.",de:"Sprudelwasser, bitte."},
+        {fr:"Un verre de vin rouge, s'il vous plaît.",de:"Ein Glas Rotwein, bitte."},
+        {fr:"Deux bières, s'il vous plaît.",de:"Zwei Bier, bitte."}]},
+    { q:{fr:"Vous avez choisi ?",phon:"wu-sa-we scho-a-si",de:"Haben Sie gewählt?"},
+      opts:[
+        {fr:"Je prends le poulet avec des frites.",de:"Ich nehme das Hähnchen mit Pommes."},
+        {fr:"Le poisson, s'il vous plaît. Qu'est-ce que vous recommandez ?",de:"Den Fisch, bitte. Was empfehlen Sie dazu?"},
+        {fr:"Je suis végétarien. Qu'est-ce que vous recommandez ?",de:"Ich bin Vegetarier. Was empfehlen Sie?"}]},
+    { q:{fr:"Tout s'est bien passé ?",phon:"tu ßä bjäng pa-ße",de:"War alles in Ordnung?"},
+      opts:[
+        {fr:"Oui, c'était délicieux !",de:"Ja, es war köstlich!"},
+        {fr:"Très bien, merci. L'addition, s'il vous plaît.",de:"Sehr gut, danke. Die Rechnung, bitte."},
+        {fr:"Oui, merci. Vous prenez la carte ?",de:"Ja, danke. Nehmen Sie Kartenzahlung?"}]},
+    { q:{fr:"Merci beaucoup et bonne soirée !",phon:"mär-ßi bo-ku e bon ßo-a-re",de:"Vielen Dank und einen schönen Abend!"},
+      opts:[
+        {fr:"Merci, au revoir !",de:"Danke, auf Wiedersehen!"},
+        {fr:"Bonne soirée !",de:"Schönen Abend noch!"},
+        {fr:"Merci pour tout !",de:"Danke für alles!"}]}
+  ]},
+  alltag: { title:"Einen Freund treffen", steps:[
+    { q:{fr:"Salut ! Ça fait longtemps ! Ça va ?",phon:"ßa-lü! ßa fä long-tang! ßa wa",de:"Hallo! Lange nicht gesehen! Wie geht's?"},
+      opts:[
+        {fr:"Ça va bien, merci. Et toi ?",de:"Gut, danke. Und dir?"},
+        {fr:"Je suis un peu fatigué…",de:"Ich bin etwas müde…"},
+        {fr:"Ça va ! Quoi de neuf ?",de:"Gut! Was gibt's Neues?"}]},
+    { q:{fr:"Tout va bien ! Tu fais quoi ce week-end ?",phon:"tu wa bjäng! tü fä ko-a ßö wi-känd",de:"Alles gut! Was machst du am Wochenende?"},
+      opts:[
+        {fr:"Je ne sais pas encore.",de:"Ich weiß es noch nicht."},
+        {fr:"Je fais du sport samedi.",de:"Ich mache am Samstag Sport."},
+        {fr:"On prend un verre ?",de:"Trinken wir was zusammen?"}]},
+    { q:{fr:"Bonne idée ! On se voit quand ?",phon:"bo-ni-de! ong ßö wo-a kang",de:"Gute Idee! Wann sehen wir uns?"},
+      opts:[
+        {fr:"Samedi soir, ça te dit ?",de:"Samstagabend, hast du Lust?"},
+        {fr:"Demain, si tu veux.",de:"Morgen, wenn du willst."},
+        {fr:"Je t'appelle plus tard, d'accord ?",de:"Ich rufe dich später an, okay?"}]},
+    { q:{fr:"Ça marche ! Tu viens avec ta copine ?",phon:"ßa marsch! tü wjäng a-wäk ta ko-pin",de:"Geht klar! Kommst du mit deiner Freundin?"},
+      opts:[
+        {fr:"Oui, bien sûr !",de:"Ja, natürlich!"},
+        {fr:"Non, je viens seul.",de:"Nein, ich komme allein."},
+        {fr:"Peut-être… on verra !",de:"Vielleicht… mal sehen!"}]},
+    { q:{fr:"Super. À samedi alors !",phon:"ßü-pär. a ßam-di a-lor",de:"Super. Dann bis Samstag!"},
+      opts:[
+        {fr:"Avec plaisir, à samedi !",de:"Sehr gern, bis Samstag!"},
+        {fr:"À plus tard !",de:"Bis später!"},
+        {fr:"Prends soin de toi !",de:"Pass auf dich auf!"}]}
+  ]},
+  top: { title:"Small Talk auf der Straße", steps:[
+    { q:{fr:"Bonjour ! Qu'est-ce que tu fais ?",phon:"bong-schur! käs-kö tü fä",de:"Hallo! Was machst du gerade?"},
+      opts:[
+        {fr:"Je travaille un peu.",de:"Ich arbeite ein bisschen."},
+        {fr:"Rien… et toi ?",de:"Nichts… und du?"},
+        {fr:"J'apprends le français !",de:"Ich lerne Französisch!"}]},
+    { q:{fr:"C'est vrai ? Depuis quand ?",phon:"ßä wrä? dö-pwi kang",de:"Echt? Seit wann?"},
+      opts:[
+        {fr:"Depuis une semaine !",de:"Seit einer Woche!"},
+        {fr:"Depuis un mois, je crois.",de:"Seit einem Monat, glaube ich."},
+        {fr:"Je ne sais plus !",de:"Ich weiß es nicht mehr!"}]},
+    { q:{fr:"Tu parles déjà très bien !",phon:"tü parl de-scha trä bjäng",de:"Du sprichst schon sehr gut!"},
+      opts:[
+        {fr:"Merci beaucoup !",de:"Vielen Dank!"},
+        {fr:"Je parle un peu français…",de:"Ich spreche ein bisschen Französisch…"},
+        {fr:"C'est difficile, mais j'adore !",de:"Es ist schwer, aber ich liebe es!"}]},
+    { q:{fr:"Qu'est-ce que tu veux faire maintenant ?",phon:"käs-kö tü wö fär mängt-nang",de:"Was willst du jetzt machen?"},
+      opts:[
+        {fr:"On y va ?",de:"Gehen wir los?"},
+        {fr:"Je dois partir, désolé.",de:"Ich muss los, tut mir leid."},
+        {fr:"Attends-moi, j'arrive !",de:"Warte auf mich, ich komme!"}]},
+    { q:{fr:"D'accord, à bientôt !",phon:"da-kor, a bjäng-to",de:"Okay, bis bald!"},
+      opts:[
+        {fr:"À bientôt !",de:"Bis bald!"},
+        {fr:"Merci pour tout !",de:"Danke für alles!"},
+        {fr:"Bonne journée !",de:"Schönen Tag noch!"}]}
+  ]},
+  kognaten: { title:"Wochenendpläne (fast alles Kognaten!)", steps:[
+    { q:{fr:"Tu as une idée pour le week-end ?",phon:"tü a ün i-de pur lö wi-känd",de:"Hast du eine Idee fürs Wochenende?"},
+      opts:[
+        {fr:"On va au théâtre ?",de:"Gehen wir ins Theater?"},
+        {fr:"Un concert de musique classique ?",de:"Ein Konzert mit klassischer Musik?"},
+        {fr:"Le cinéma – simple et parfait !",de:"Kino – einfach und perfekt!"}]},
+    { q:{fr:"Excellente idée ! On prend le train ou le taxi ?",phon:"äk-ße-langt i-de! ong prang lö träng u lö tak-ßi",de:"Ausgezeichnete Idee! Nehmen wir den Zug oder das Taxi?"},
+      opts:[
+        {fr:"Le train, c'est rapide.",de:"Den Zug, das ist schnell."},
+        {fr:"Un taxi, c'est plus simple.",de:"Ein Taxi, das ist einfacher."},
+        {fr:"Le bus, c'est normal pour moi.",de:"Den Bus, das ist normal für mich."}]},
+    { q:{fr:"Et après, un restaurant ?",phon:"e a-prä, äng räs-to-rang",de:"Und danach ein Restaurant?"},
+      opts:[
+        {fr:"Oui ! J'adore les desserts et le chocolat.",de:"Ja! Ich liebe Desserts und Schokolade."},
+        {fr:"Une soupe et une salade, parfait.",de:"Eine Suppe und ein Salat, perfekt."},
+        {fr:"Le menu du restaurant est excellent !",de:"Das Menü des Restaurants ist ausgezeichnet!"}]},
+    { q:{fr:"Parfait, c'est une situation idéale !",phon:"par-fä, ßä-tün ßi-tü-a-ßjong i-de-al",de:"Perfekt, das ist eine ideale Situation!"},
+      opts:[
+        {fr:"Oui, c'est parfait !",de:"Ja, das ist perfekt!"},
+        {fr:"Excellente organisation !",de:"Ausgezeichnete Organisation!"},
+        {fr:"Merci pour l'invitation !",de:"Danke für die Einladung!"}]}
+  ]},
+  schimpf: { title:"Ein Freund lässt Dampf ab", steps:[
+    { q:{fr:"Putain, quelle journée ! Tout va mal !",phon:"pü-täng, käl schur-ne! tu wa mal",de:"Verdammt, was für ein Tag! Alles läuft schief!"},
+      opts:[
+        {fr:"La vache ! Qu'est-ce qui se passe ?",de:"Krass! Was ist denn los?"},
+        {fr:"Oh là là… raconte !",de:"Oh je… erzähl!"},
+        {fr:"C'est pas vrai !",de:"Das gibt's doch nicht!"}]},
+    { q:{fr:"Mon chef est un vrai connard !",phon:"mong schäf ä-täng wrä ko-nar",de:"Mein Chef ist ein echtes Arschloch!"},
+      opts:[
+        {fr:"Quel con !",de:"So ein Idiot!"},
+        {fr:"Ça va pas la tête, ce type ?!",de:"Geht's noch bei dem Typen?!"},
+        {fr:"Laisse tomber, il est débile.",de:"Vergiss ihn, der ist bescheuert."}]},
+    { q:{fr:"Et en plus, le métro… quel bordel !",phon:"e ang plüss, lö me-tro… käl bor-däl",de:"Und dazu die U-Bahn… was für ein Chaos!"},
+      opts:[
+        {fr:"C'est chiant !",de:"Das ist echt ätzend!"},
+        {fr:"Et merde…",de:"Ach Mist…"},
+        {fr:"Je m'en fous – viens, on prend un verre !",de:"Egal – komm, wir trinken was!"}]},
+    { q:{fr:"Tu as raison… merci, ça va mieux !",phon:"tü a rä-song… mär-ßi, ßa wa mjö",de:"Du hast recht… danke, es geht schon besser!"},
+      opts:[
+        {fr:"De rien ! T'inquiète.",de:"Gern! Mach dir keinen Kopf."},
+        {fr:"Pas de souci !",de:"Kein Problem!"},
+        {fr:"Arrête tes conneries et souris !",de:"Schluss mit dem Quatsch, jetzt wird gelächelt!"}]}
+  ]},
+  flirt: { title:"Ein Abend in der Bar", steps:[
+    { q:{fr:"Bonsoir… on se connaît ?",phon:"bong-ßo-ar… ong ßö ko-nä",de:"Guten Abend… kennen wir uns?"},
+      opts:[
+        {fr:"Je ne crois pas… je peux t'offrir un verre ?",de:"Ich glaube nicht… darf ich dir einen Drink ausgeben?"},
+        {fr:"Peut-être… tu viens souvent ici ?",de:"Vielleicht… kommst du öfter her?"},
+        {fr:"Non, mais tu as un charme fou.",de:"Nein, aber du hast einen Wahnsinns-Charme."}]},
+    { q:{fr:"(lächelt) Avec plaisir. Tu es d'ici ?",phon:"a-wäk plä-sir. tü ä di-ßi",de:"(lächelt) Sehr gern. Bist du von hier?"},
+      opts:[
+        {fr:"Non, je suis en vacances.",de:"Nein, ich bin im Urlaub."},
+        {fr:"Je viens d'Allemagne. Et toi ?",de:"Ich komme aus Deutschland. Und du?"},
+        {fr:"Oui… et je connais tous les bons bars.",de:"Ja… und ich kenne alle guten Bars."}]},
+    { q:{fr:"J'adore ton accent !",phon:"scha-dor tong ak-ßang",de:"Ich liebe deinen Akzent!"},
+      opts:[
+        {fr:"Merci… et moi, j'adore ton sourire.",de:"Danke… und ich liebe dein Lächeln."},
+        {fr:"Tu me plais, tu sais.",de:"Du gefällst mir, weißt du."},
+        {fr:"Tu as de très beaux yeux.",de:"Du hast wunderschöne Augen."}]},
+    { q:{fr:"Tu me fais de l'effet, tu sais…",phon:"tü mö fä dö le-fä, tü ßä",de:"Du hast eine Wirkung auf mich, weißt du…"},
+      opts:[
+        {fr:"Viens plus près…",de:"Komm näher…"},
+        {fr:"Je peux t'embrasser ?",de:"Darf ich dich küssen?"},
+        {fr:"Tu me rends fou.",de:"Du machst mich verrückt."}]},
+    { q:{fr:"On prend un dernier verre chez moi ?",phon:"ong prang äng där-nje wär sche mo-a",de:"Trinken wir noch einen Absacker bei mir?"},
+      opts:[
+        {fr:"Avec plaisir !",de:"Sehr gern!"},
+        {fr:"Une autre fois… on se revoit quand ?",de:"Ein andermal… wann sehen wir uns wieder?"},
+        {fr:"J'ai hâte !",de:"Ich kann's kaum erwarten!"}]}
+  ]},
+  musik: { title:"Die Klavierstunde", steps:[
+    { q:{fr:"Bonjour ! Tu as travaillé le morceau cette semaine ?",phon:"bong-schur! tü a tra-wa-je lö mor-ßo ßät ßö-män",de:"Hallo! Hast du das Stück diese Woche geübt?"},
+      opts:[
+        {fr:"Oui, tous les jours !",de:"Ja, jeden Tag!"},
+        {fr:"Un peu… ce passage est difficile.",de:"Ein bisschen… diese Stelle ist schwer."},
+        {fr:"J'ai surtout fait des gammes.",de:"Ich habe vor allem Tonleitern geübt."}]},
+    { q:{fr:"Bien ! Joue-le par cœur, s'il te plaît.",phon:"bjäng! schu lö par kör, ßil tö plä",de:"Gut! Spiel es bitte auswendig."},
+      opts:[
+        {fr:"D'accord, j'essaie !",de:"Okay, ich versuche es!"},
+        {fr:"Plus lentement, d'accord ?",de:"Etwas langsamer, okay?"},
+        {fr:"J'ai besoin de la partition…",de:"Ich brauche die Noten…"}]},
+    { q:{fr:"Pas mal ! Mais attention à la main gauche.",phon:"pa mal! mä a-tang-ßjong a la mäng gosch",de:"Nicht schlecht! Aber Achtung bei der linken Hand."},
+      opts:[
+        {fr:"D'accord… encore une fois ?",de:"Okay… noch einmal?"},
+        {fr:"Le doigté est difficile ici.",de:"Der Fingersatz ist hier schwierig."},
+        {fr:"Je recommence depuis le début.",de:"Ich fange von vorne an."}]},
+    { q:{fr:"Beaucoup mieux ! Tu fais des progrès !",phon:"bo-ku mjö! tü fä de pro-grä",de:"Viel besser! Du machst Fortschritte!"},
+      opts:[
+        {fr:"Merci beaucoup !",de:"Vielen Dank!"},
+        {fr:"C'est grâce au métronome !",de:"Das liegt am Metronom!"},
+        {fr:"J'adore ce morceau.",de:"Ich liebe dieses Stück."}]},
+    { q:{fr:"Dis-moi… quel est ton compositeur préféré ?",phon:"di mo-a… kä-lä tong kong-po-si-tör pre-fe-re",de:"Sag mal… wer ist dein Lieblingskomponist?"},
+      opts:[
+        {fr:"J'adore Chopin et Debussy.",de:"Ich liebe Chopin und Debussy."},
+        {fr:"La musique classique, surtout Mozart.",de:"Klassische Musik, vor allem Mozart."},
+        {fr:"J'aime improviser !",de:"Ich improvisiere am liebsten!"}]}
+  ]}
+};
+
+/* =====================================================================
    2) SM-2 ALGORITHMUS (7-Tage-komprimiert)
 ===================================================================== */
 const HOUR = 3600 * 1000;
@@ -1346,6 +1567,115 @@ let flipped = false;
 const GRADE_LABELS = [["0","Blackout"],["1","Falsch"],["2","Fast"],["3","Schwer"],["4","Gut"],["5","Perfekt"]];
 function esc(s){ return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
 
+/* ---------- Konversations-Simulator ---------- */
+let convo = null;   // { deck, step, history:[{q,a}], spoken }
+
+function startConvo(deck){
+  if (!DIALOGUES[deck]) return;
+  convo = { deck, step:0, history:[], spoken:-1 };
+  renderAll();
+}
+function endConvo(){ convo = null; renderAll(); }
+
+function seenTokens(){
+  const set = new Set();
+  state.cards.forEach(c => {
+    if (!c.seen) return;
+    String(c.french).toLowerCase().split(/[^a-zàâçéèêëîïôöùûüœ'-]+/).forEach(t => {
+      t = t.replace(/^[ldjmts]'/,"");
+      if (t.length > 1) set.add(t);
+    });
+  });
+  return set;
+}
+function knownScore(text, tok){
+  const words = String(text).toLowerCase().split(/[^a-zàâçéèêëîïôöùûüœ'-]+/)
+    .map(w => w.replace(/^[ldjmts]'/,"")).filter(w => w.length > 1);
+  if (!words.length) return 0;
+  let k = 0; words.forEach(w => { if (tok.has(w)) k++; });
+  return k / words.length;
+}
+function bubbleQ(q){
+  return `<div class="bubble q">🇫🇷 ${esc(q.fr)}
+    <span class="sub subphon">[${esc(q.phon)}]</span>
+    <span class="sub">${esc(q.de)}</span></div>`;
+}
+function bubbleA(a){
+  return `<div class="bubble a">${esc(a.fr)}<span class="sub">${esc(a.de)}</span></div>`;
+}
+function renderConvo(){
+  const sc = DIALOGUES[convo.deck];
+  const done = convo.step >= sc.steps.length;
+  const tok = seenTokens();
+
+  let chat = "";
+  convo.history.forEach(h => { chat += bubbleQ(h.q) + bubbleA(h.a); });
+
+  let optsHtml = "";
+  if (!done) {
+    const st = sc.steps[convo.step];
+    chat += bubbleQ(st.q);
+    const sorted = st.opts.map((o,i) => ({ o, i, s: knownScore(o.fr, tok) }))
+                          .sort((a,b) => b.s - a.s);
+    optsHtml = `<div class="convo-opts">` + sorted.map(x =>
+      `<button class="convo-opt" data-i="${x.i}">${esc(x.o.fr)}` +
+      (x.s >= 0.6 ? `<span class="known">✓ bekannte Wörter</span>` : ``) +
+      `<small>${esc(x.o.de)}</small></button>`).join("") + `</div>`;
+  } else {
+    chat += `<div class="done" style="box-shadow:none;border-style:dashed;padding:22px">
+      <h2 style="font-size:1.1rem">Dialog geschafft ! 🗣️</h2>
+      <p>Du hast das komplette Szenario „${esc(sc.title)}" durchgespielt.
+      Tipp: Sprich beim nächsten Durchgang jede Antwort LAUT mit, bevor du tippst.</p>
+      <div class="backup-row" style="margin-top:14px">
+        <button class="backup-btn" id="convoAgain">🔁 Nochmal</button>
+        <button class="backup-btn" id="convoBack">🃏 Zurück zu den Karten</button>
+      </div></div>`;
+  }
+
+  stage.innerHTML = `
+    <div class="panel" style="display:flex;flex-direction:column;flex:1">
+      <div class="convo-head">
+        <h3>🗣️ ${esc(sc.title)}</h3>
+        <button class="link-btn" id="convoExit">✕ Beenden</button>
+      </div>
+      <div id="convoScroll" style="display:flex;flex-direction:column;gap:8px;overflow-y:auto;max-height:52vh">${chat}</div>
+      ${optsHtml}
+    </div>`;
+  controls.innerHTML = "";
+
+  document.getElementById("convoExit").addEventListener("click", endConvo);
+  const again = document.getElementById("convoAgain");
+  if (again) again.addEventListener("click", () => startConvo(convo.deck));
+  const back = document.getElementById("convoBack");
+  if (back) back.addEventListener("click", endConvo);
+
+  stage.querySelectorAll(".convo-opt").forEach(btn => btn.addEventListener("click", () => {
+    const st = sc.steps[convo.step];
+    const o = st.opts[parseInt(btn.dataset.i,10)];
+    convo.history.push({ q: st.q, a: o });
+    convo.step += 1;
+    TTS.speak(o.fr);                                   // die gewählte Antwort vorsprechen
+    renderAll();
+  }));
+
+  const scroll = document.getElementById("convoScroll");
+  if (scroll) scroll.scrollTop = scroll.scrollHeight;
+
+  if (!done && convo.spoken !== convo.step) {          // neue Frage einmal vorlesen
+    convo.spoken = convo.step;
+    setTimeout(() => { if (convo && convo.spoken === convo.step) TTS.speak(sc.steps[convo.step].q.fr); }, 900);
+  }
+}
+function updateConvoLaunch(){
+  const el = document.getElementById("convoLaunch");
+  const show = state.view === "learn" && !convo && !!DIALOGUES[state.activeDeck];
+  el.style.display = show ? "" : "none";
+  if (show) {
+    el.innerHTML = `<button class="convo-launch-btn" id="convoBtn">🗣️ Konversation üben: ${esc(DIALOGUES[state.activeDeck].title)}</button>`;
+    document.getElementById("convoBtn").addEventListener("click", () => startConvo(state.activeDeck));
+  }
+}
+
 function renderNav(){
   rollover();
   let html = "";
@@ -1360,9 +1690,11 @@ function renderNav(){
   html += `<button class="nav-btn view-btn ${state.view==="guide"?"active":""}" data-view="guide">📖 Aussprache</button>`;
   navEl.innerHTML = html;
   navEl.querySelectorAll("[data-deck]").forEach(b => b.addEventListener("click", () => {
+    convo = null;
     state.activeDeck = b.dataset.deck; state.view = "learn"; saveState(); renderAll();
   }));
   navEl.querySelectorAll("[data-view]").forEach(b => b.addEventListener("click", () => {
+    convo = null;
     state.view = b.dataset.view; saveState(); renderAll();
   }));
 }
@@ -1370,11 +1702,14 @@ function renderNav(){
 function renderAll(){
   renderNav();
   const learn = state.view === "learn";
-  document.getElementById("progressWrap").style.display = learn ? "" : "none";
-  document.getElementById("headerStats").style.display  = learn ? "" : "none";
-  controls.style.display = learn ? "" : "none";
+  const cardsVisible = learn && !convo;
+  document.getElementById("progressWrap").style.display = cardsVisible ? "" : "none";
+  document.getElementById("headerStats").style.display  = cardsVisible ? "" : "none";
+  controls.style.display = cardsVisible ? "" : "none";
+  updateConvoLaunch();
   if (state.view === "stats") { renderStats(); return; }
   if (state.view === "guide") { renderGuide(); return; }
+  if (convo) { renderConvo(); return; }
   render();
 }
 
