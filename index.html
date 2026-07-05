@@ -1,0 +1,1799 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Français en 7 jours</title>
+<style>
+  :root{
+    --bg:#F6F5F1; --ink:#1C1F2E; --muted:#6E7180; --line:#E5E4DD; --card:#FFFFFF;
+    --bleu:#20408F; --bleu-dark:#172E68; --rouge:#D3323A; --blanc:#FFFFFF;
+    --gold:#B07A1F; --vert:#1F7A4D;
+    --radius:18px; --shadow:0 10px 30px rgba(28,31,46,.10);
+  }
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{height:100%}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+    background:var(--bg);color:var(--ink);display:flex;justify-content:center;min-height:100dvh;
+  }
+  .app{width:100%;max-width:480px;display:flex;flex-direction:column;
+       padding:14px 16px calc(16px + env(safe-area-inset-bottom))}
+
+  header{display:flex;align-items:baseline;justify-content:space-between;gap:8px;padding:2px 2px 10px}
+  .brand{font-size:1.02rem;font-weight:800;letter-spacing:-.02em}
+  .brand em{font-style:normal;color:var(--bleu)}
+  .brand .accent{color:var(--rouge)}
+  .day-badge{font-size:.78rem;font-weight:700;color:var(--muted);white-space:nowrap}
+
+  /* ---------- Menü / Navigation ---------- */
+  .nav{display:flex;flex-wrap:wrap;gap:6px;padding-bottom:10px}
+  .nav-btn{
+    flex:0 0 auto;display:flex;align-items:center;gap:5px;
+    border:1px solid var(--line);background:var(--card);color:var(--ink);
+    border-radius:99px;padding:8px 12px;font-size:.78rem;font-weight:800;cursor:pointer;
+    white-space:nowrap;transition:transform .1s ease;
+  }
+  .nav-btn:active{transform:scale(.96)}
+  .nav-btn .due-badge{
+    background:var(--rouge);color:#fff;border-radius:99px;font-size:.62rem;
+    padding:1px 6px;font-weight:800;
+  }
+  .nav-btn.active{background:var(--bleu);border-color:var(--bleu);color:#fff}
+  .nav-btn.active .due-badge{background:#fff;color:var(--bleu)}
+  .nav-btn.view-btn{border-style:dashed}
+
+  /* Tricolor-Fortschrittsbalken */
+  .progress-wrap{margin-bottom:6px}
+  .progress-track{height:10px;border-radius:99px;background:#ECEBE4;overflow:hidden;border:1px solid var(--line)}
+  .progress-fill{height:100%;width:0%;
+    background:linear-gradient(90deg,var(--bleu) 0 33.3%,var(--blanc) 33.3% 66.6%,var(--rouge) 66.6% 100%);
+    border-radius:99px;transition:width .5s ease}
+  .progress-label{display:flex;justify-content:space-between;font-size:.72rem;color:var(--muted);margin-top:5px;font-weight:600}
+
+  .stats{display:flex;gap:8px;margin:10px 0 12px}
+  .stat{flex:1;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:8px 6px;text-align:center}
+  .stat b{display:block;font-size:1.05rem;letter-spacing:-.02em}
+  .stat span{font-size:.64rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;font-weight:700}
+
+  /* ---------- Karte ---------- */
+  .stage{flex:1;display:flex;flex-direction:column;justify-content:center;min-height:340px;perspective:1200px}
+  .card{position:relative;width:100%;min-height:320px;transform-style:preserve-3d;
+        transition:transform .55s cubic-bezier(.2,.7,.25,1);cursor:pointer}
+  .card.flipped{transform:rotateY(180deg)}
+  .face{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;
+        background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+        box-shadow:var(--shadow);display:flex;flex-direction:column;align-items:center;
+        justify-content:center;padding:30px 22px;text-align:center;overflow:hidden}
+  .face::before{content:"";position:absolute;top:0;left:0;right:0;height:5px;
+    background:linear-gradient(90deg,var(--bleu) 0 33.3%,#fff 33.3% 66.6%,var(--rouge) 66.6% 100%);
+    border-bottom:1px solid var(--line)}
+  .face.back{transform:rotateY(180deg)}
+  .cat-chip{font-size:.66rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;
+    color:var(--bleu);background:#EDF0F9;border-radius:99px;padding:5px 12px;margin-bottom:16px}
+  .face.back .cat-chip{color:var(--rouge);background:#FBEDEE;margin-bottom:12px}
+  .word{font-size:clamp(1.3rem,5.6vw,1.9rem);font-weight:800;letter-spacing:-.02em;line-height:1.3}
+  .face.back .word{color:var(--bleu-dark)}
+  .hint{margin-top:16px;font-size:.74rem;color:var(--muted);font-weight:600}
+  .lang-tag{position:absolute;bottom:13px;right:17px;font-size:.66rem;font-weight:800;color:var(--muted);letter-spacing:.1em}
+  .new-flag{position:absolute;top:15px;left:15px;font-size:.62rem;font-weight:800;color:var(--rouge);letter-spacing:.08em}
+
+  .phon{margin-top:10px;font-size:.98rem;font-weight:600;color:var(--rouge);
+        font-family:"SF Mono",ui-monospace,Menlo,Consolas,monospace;letter-spacing:.01em;line-height:1.45}
+  .cog{margin-top:10px;font-size:.86rem;font-weight:800;color:#6B4FA1;
+       background:#F1EDF9;border:1px solid #E0D7F2;border-radius:99px;padding:6px 14px}
+  .speak-btn{margin-top:14px;display:inline-flex;align-items:center;gap:8px;
+    background:#EDF0F9;color:var(--bleu-dark);border:1px solid #D6DCF0;border-radius:99px;
+    padding:9px 18px;font-size:.84rem;font-weight:800;cursor:pointer;transition:transform .1s ease}
+  .speak-btn:active{transform:scale(.95)}
+  .speak-btn.speaking{background:var(--bleu);color:#fff;border-color:var(--bleu)}
+  .phon-legend{margin-top:12px;font-size:.64rem;color:var(--muted);font-weight:600;line-height:1.4}
+
+  /* ---------- Bewertung ---------- */
+  .controls{margin-top:14px;min-height:128px}
+  .reveal-btn{width:100%;padding:17px;border:none;border-radius:14px;background:var(--bleu);
+    color:#fff;font-size:1.02rem;font-weight:800;cursor:pointer;
+    box-shadow:0 6px 16px rgba(32,64,143,.28);transition:transform .12s ease}
+  .reveal-btn:active{transform:scale(.98)}
+  .grade-help{font-size:.7rem;color:var(--muted);text-align:center;margin-bottom:8px;font-weight:600}
+  .grades{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+  .grade{border:none;border-radius:12px;padding:12px 4px;cursor:pointer;font-weight:800;color:#fff;
+    font-size:.9rem;line-height:1.15;transition:transform .1s ease;
+    display:flex;flex-direction:column;gap:2px;align-items:center}
+  .grade small{font-weight:700;font-size:.6rem;opacity:.9}
+  .grade:active{transform:scale(.96)}
+  .g0{background:#B3261E}.g1{background:#C6473D}.g2{background:#D3323A}
+  .g3{background:#5A6FB0}.g4{background:#2F4EA0}.g5{background:var(--bleu-dark)}
+
+  /* ---------- Fertig-Screen ---------- */
+  .done{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+    box-shadow:var(--shadow);padding:32px 22px;text-align:center}
+  .done h2{font-size:1.35rem;letter-spacing:-.02em;margin-bottom:10px}
+  .done p{color:var(--muted);font-size:.88rem;line-height:1.5;margin-bottom:6px}
+  .done .next-due{font-weight:800;color:var(--bleu);font-size:.98rem;margin:12px 0 16px}
+  .ghost-btn{background:none;border:2px solid var(--bleu);color:var(--bleu);border-radius:12px;
+    padding:11px 18px;font-weight:800;font-size:.88rem;cursor:pointer}
+
+  /* ---------- Statistik-Ansicht ---------- */
+  .panel{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+         box-shadow:var(--shadow);padding:18px;margin-bottom:14px}
+  .panel h3{font-size:.95rem;letter-spacing:-.01em;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+  .deck-dot{width:10px;height:10px;border-radius:99px;display:inline-block}
+  .mini-bar-track{height:9px;border-radius:99px;background:#ECEBE4;border:1px solid var(--line);overflow:hidden;margin:6px 0 10px}
+  .mini-bar-fill{height:100%;border-radius:99px;transition:width .5s ease}
+  .stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:4px}
+  .stat-cell{background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:7px 3px;text-align:center}
+  .stat-cell b{display:block;font-size:.95rem}
+  .stat-cell span{font-size:.58rem;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.04em}
+  .stat-meta{display:flex;justify-content:space-between;font-size:.7rem;color:var(--muted);font-weight:700;margin-top:9px}
+  .chart{display:flex;align-items:flex-end;gap:6px;height:110px;margin-top:8px}
+  .chart .col{flex:1;display:flex;flex-direction:column;justify-content:flex-end;align-items:stretch;height:100%;gap:1px}
+  .chart .seg{border-radius:3px;min-height:0}
+  .chart-labels{display:flex;gap:6px;margin-top:5px}
+  .chart-labels span{flex:1;text-align:center;font-size:.62rem;color:var(--muted);font-weight:700}
+  .legend{display:flex;flex-wrap:wrap;gap:10px;margin-top:10px;font-size:.66rem;font-weight:700;color:var(--muted)}
+  .legend span{display:flex;align-items:center;gap:5px}
+
+  /* ---------- Aussprache-Guide ---------- */
+  .guide{overflow-y:auto}
+  .guide .panel p{font-size:.86rem;line-height:1.6;color:var(--ink)}
+  .guide .panel p+p{margin-top:8px}
+  .guide .intro{font-size:.86rem;color:var(--muted);line-height:1.6}
+  .rule-table{width:100%;border-collapse:collapse;margin-top:8px;font-size:.82rem}
+  .rule-table th{text-align:left;font-size:.64rem;text-transform:uppercase;letter-spacing:.05em;
+                 color:var(--muted);padding:4px 6px;border-bottom:1px solid var(--line)}
+  .rule-table td{padding:7px 6px;border-bottom:1px solid var(--line);vertical-align:top;line-height:1.45}
+  .rule-table tr:last-child td{border-bottom:none}
+  .fr{font-weight:800;color:var(--bleu-dark)}
+  .ph{font-family:"SF Mono",ui-monospace,Menlo,Consolas,monospace;color:var(--rouge);font-weight:600;font-size:.78rem}
+  .tip{background:#EDF0F9;border:1px solid #D6DCF0;border-radius:10px;padding:10px 12px;
+       font-size:.78rem;line-height:1.5;margin-top:10px;color:var(--bleu-dark);font-weight:600}
+
+  /* ---------- Sicherung ---------- */
+  .backup{margin-top:18px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px}
+  .backup-row{display:flex;gap:8px}
+  .backup-btn{flex:1;display:flex;align-items:center;justify-content:center;gap:6px;
+    border:1px solid #D6DCF0;background:#EDF0F9;color:var(--bleu-dark);border-radius:10px;
+    padding:11px 6px;font-size:.8rem;font-weight:800;cursor:pointer;transition:transform .1s ease}
+  .backup-btn:active{transform:scale(.97)}
+  .backup-status{margin-top:8px;text-align:center;font-size:.66rem;color:var(--muted);font-weight:600;line-height:1.4}
+  .backup-status.warn{color:var(--rouge)}
+  .backup-warning{margin-top:14px;background:#FBEDEE;border:1px solid #F2CFD1;color:#8E2227;
+    border-radius:10px;padding:10px 12px;font-size:.74rem;font-weight:700;line-height:1.4}
+
+  /* ---------- Cloud-Sync (einklappbar) ---------- */
+  .sync-box{margin-bottom:12px;padding-bottom:12px;border-bottom:1px dashed var(--line)}
+  .sync-toggle{
+    width:100%;display:flex;align-items:center;gap:8px;
+    background:none;border:none;cursor:pointer;padding:2px 0;
+    font-size:.82rem;font-weight:800;color:var(--ink);text-align:left;
+  }
+  .sync-toggle .sync-summary{margin-left:auto;font-size:.66rem;font-weight:700;color:var(--muted)}
+  .sync-toggle .chev{font-size:.7rem;color:var(--muted);transition:transform .2s ease}
+  .sync-toggle .chev.open{transform:rotate(180deg)}
+  .sync-body{margin-top:10px}
+  .sync-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px}
+  .sync-head b{font-size:.82rem}
+  .sync-dot{width:8px;height:8px;border-radius:99px;background:#C6C6BE}
+  .sync-dot.on{background:var(--vert)}
+  .sync-dot.err{background:var(--rouge)}
+  .sync-code{
+    display:block;width:100%;text-align:center;
+    font-family:"SF Mono",ui-monospace,Menlo,Consolas,monospace;
+    font-size:.78rem;font-weight:700;color:var(--bleu-dark);
+    background:var(--bg);border:1px solid var(--line);border-radius:10px;
+    padding:9px 8px;margin:6px 0;word-break:break-all;cursor:pointer;
+  }
+  .sync-status-line{font-size:.66rem;color:var(--muted);font-weight:600;text-align:center;margin-top:6px;line-height:1.4}
+  .sync-status-line.err{color:var(--rouge)}
+  .link-btn{background:none;border:none;color:var(--bleu);font-size:.7rem;font-weight:800;
+    text-decoration:underline;cursor:pointer;padding:4px}
+
+  .reset{margin-top:16px;text-align:center}
+  .reset button{background:none;border:none;color:var(--muted);font-size:.7rem;text-decoration:underline;cursor:pointer}
+
+  @media (prefers-reduced-motion:reduce){
+    .card,.progress-fill,.mini-bar-fill{transition:none}
+  }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <header>
+    <div class="brand"><em>Français</em> en 7 <span class="accent">jours</span></div>
+    <div class="day-badge" id="dayBadge">Tag 1 von 7</div>
+  </header>
+
+  <nav class="nav" id="nav"></nav>
+
+  <div class="progress-wrap" id="progressWrap">
+    <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+    <div class="progress-label"><span id="readyLabel"></span><span id="dueLabel"></span></div>
+  </div>
+
+  <div class="stats" id="headerStats">
+    <div class="stat"><b id="statDue">0</b><span>Fällig</span></div>
+    <div class="stat"><b id="statNew">0</b><span>Neu heute</span></div>
+    <div class="stat"><b id="statLearned">0</b><span>Gefestigt</span></div>
+  </div>
+
+  <div class="stage" id="stage"></div>
+  <div class="controls" id="controls"></div>
+
+  <div class="backup">
+    <div class="sync-box">
+      <button class="sync-toggle" id="syncToggle" aria-expanded="false">
+        ☁️ Cloud-Sync <span class="sync-dot" id="syncDot"></span>
+        <span class="sync-summary" id="syncSummary"></span>
+        <span class="chev" id="syncChev">▼</span>
+      </button>
+      <div class="sync-body" id="syncBody" style="display:none"></div>
+    </div>
+    <div class="backup-row">
+      <button class="backup-btn" id="exportBtn">💾 Lernstand sichern</button>
+      <button class="backup-btn" id="importBtn">📂 Wiederherstellen</button>
+    </div>
+    <div class="backup-status" id="backupStatus"></div>
+    <input type="file" id="importFile" accept=".json,application/json" style="display:none">
+  </div>
+
+  <div class="reset"><button id="resetBtn">Fortschritt zurücksetzen</button></div>
+</div>
+
+<script>
+"use strict";
+
+/* =====================================================================
+   0) STAPEL-DEFINITION
+===================================================================== */
+const DECKS = {
+  urlaub:   { label:"🎒 Urlaub",   ready:"Urlaubs-Ready",  color:"#20408F", newPerDay:30 },
+  alltag:   { label:"💬 Alltag",   ready:"Alltags-Ready",  color:"#D3323A", newPerDay:20 },
+  top:      { label:"⭐ Top 200",  ready:"Basis-Ready",    color:"#B07A1F", newPerDay:35 },
+  kognaten: { label:"🔗 Kognaten", ready:"Transfer-Ready", color:"#6B4FA1", newPerDay:40 },
+  regeln:   { label:"🔤 Regeln",   ready:"Regel-Ready",    color:"#1F7A4D", newPerDay:12 }
+};
+
+/* =====================================================================
+   1) DATENBASIS
+   Felder: id, french, german, phon, category, deck,
+   interval (Std.), repetition, efactor (2.5), nextReviewDate (0)
+===================================================================== */
+function v(id, french, german, phon, category, deck){
+  return { id, french, german, phon, category, deck,
+           interval:0, repetition:0, efactor:2.5, nextReviewDate:0 };
+}
+const U  = (id,f,g,p,c) => v(id,f,g,p,c,"urlaub");
+const AL = (id,f,g,p,c) => v(id,f,g,p,c,"alltag");
+const T  = (id,f,g,p,c) => v(id,f,g,p,c,"top");
+const R  = (id,f,g,p)   => v(id,f,g,p,"Aussprache-Regel","regeln");
+/* Kognaten: cog = das fast identische Wort in einer Sprache, die du schon kannst */
+const KG = (id,f,g,p,cog) => ({ ...v(id,f,g,p,"Griechisch-Brücke","kognaten"), cog });
+const KE = (id,f,g,p,cog) => ({ ...v(id,f,g,p,"Englisch-Brücke","kognaten"),   cog });
+const KD = (id,f,g,p,cog) => ({ ...v(id,f,g,p,"Deutsch-Brücke","kognaten"),    cog });
+
+const SEED = [
+  /* ================= STAPEL 1: URLAUB (id 1–180) ================= */
+  U(1,"Bonjour","Guten Tag","bong-schur","Höflichkeit"),
+  U(2,"Bonsoir","Guten Abend","bong-ßo-ar","Höflichkeit"),
+  U(3,"Salut","Hallo / Tschüss (locker)","ßa-lü","Höflichkeit"),
+  U(4,"Au revoir","Auf Wiedersehen","o rö-wo-ar","Höflichkeit"),
+  U(5,"S'il vous plaît","Bitte (höflich)","ßil wu plä","Höflichkeit"),
+  U(6,"Merci beaucoup","Vielen Dank","mär-ßi bo-ku","Höflichkeit"),
+  U(7,"De rien","Gern geschehen","dö ri-äng","Höflichkeit"),
+  U(8,"Excusez-moi","Entschuldigen Sie","äx-kü-se mo-a","Höflichkeit"),
+  U(9,"Pardon","Verzeihung","par-dong","Höflichkeit"),
+  U(10,"Oui / Non","Ja / Nein","wi / nong","Höflichkeit"),
+  U(11,"Peut-être","Vielleicht","pö-tätr","Höflichkeit"),
+  U(12,"Je ne comprends pas","Ich verstehe nicht","schö nö kong-prang pa","Höflichkeit"),
+  U(13,"Je ne parle pas bien français","Ich spreche nicht gut Französisch","schö nö parl pa bjäng frang-ßä","Höflichkeit"),
+  U(14,"Parlez-vous anglais ?","Sprechen Sie Englisch?","par-le wu ang-glä","Höflichkeit"),
+  U(15,"Plus lentement, s'il vous plaît","Langsamer, bitte","plü langt-mang, ßil wu plä","Höflichkeit"),
+  U(16,"Vous pouvez répéter ?","Können Sie das wiederholen?","wu pu-we re-pe-te","Höflichkeit"),
+  U(17,"Comment ?","Wie bitte?","ko-mang","Höflichkeit"),
+  U(18,"Ça va ?","Wie geht's?","ßa wa","Höflichkeit"),
+  U(19,"Ça va bien, merci","Mir geht's gut, danke","ßa wa bjäng, mär-ßi","Höflichkeit"),
+  U(20,"Enchanté","Freut mich (Kennenlernen)","ang-schang-te","Höflichkeit"),
+  U(21,"Bonne journée","Schönen Tag noch","bon schur-ne","Höflichkeit"),
+  U(22,"Bonne soirée","Schönen Abend noch","bon ßo-a-re","Höflichkeit"),
+  U(23,"Monsieur / Madame","Herr / Frau (Anrede)","mö-ßjö / ma-dam","Höflichkeit"),
+  U(24,"Je m'appelle…","Ich heiße…","schö ma-päl","Höflichkeit"),
+  U(25,"Je viens d'Allemagne","Ich komme aus Deutschland","schö wjäng dal-mann-jö","Höflichkeit"),
+  U(26,"Où est… ?","Wo ist…?","u ä","Basics"),
+  U(27,"Quand ?","Wann?","kang","Basics"),
+  U(28,"Combien ?","Wie viel?","kong-bjäng","Basics"),
+  U(29,"Combien ça coûte ?","Wie viel kostet das?","kong-bjäng ßa kut","Basics"),
+  U(30,"Comment ça s'appelle ?","Wie heißt das?","ko-mang ßa ßa-päl","Basics"),
+  U(31,"Qu'est-ce que c'est ?","Was ist das?","käs-kö ßä","Basics"),
+  U(32,"Je voudrais…","Ich hätte gern…","schö wu-drä","Basics"),
+  U(33,"J'ai besoin de…","Ich brauche…","sche bö-so-äng dö","Basics"),
+  U(34,"Est-ce qu'il y a… ?","Gibt es…?","äs-kil-ja","Basics"),
+  U(35,"Je cherche…","Ich suche…","schö schärsch","Basics"),
+  U(36,"C'est possible ?","Ist das möglich?","ßä po-ßibl","Basics"),
+  U(37,"Bien sûr","Natürlich","bjäng ßür","Basics"),
+  U(38,"D'accord","Einverstanden / okay","da-kor","Basics"),
+  U(39,"C'est bon","Das passt / alles gut","ßä bong","Basics"),
+  U(40,"Il y a…","Es gibt…","il-ja","Basics"),
+  U(41,"Je sais / Je ne sais pas","Ich weiß / Ich weiß nicht","schö ßä / schö nö ßä pa","Basics"),
+  U(42,"grand / petit","groß / klein","grang / pö-ti","Basics"),
+  U(43,"ouvert / fermé","geöffnet / geschlossen","u-wär / fär-me","Basics"),
+  U(44,"aujourd'hui","heute","o-schur-dwi","Basics"),
+  U(45,"demain","morgen","dö-mäng","Basics"),
+  U(46,"hier","gestern","i-är","Basics"),
+  U(47,"maintenant","jetzt","mängt-nang","Basics"),
+  U(48,"plus tard","später","plü tar","Basics"),
+  U(49,"ici / là-bas","hier / dort","i-ßi / la-ba","Basics"),
+  U(50,"avec / sans","mit / ohne","a-wäk / ßang","Basics"),
+  U(51,"un, deux, trois","eins, zwei, drei","äng, dö, tro-a","Zahlen & Zeit"),
+  U(52,"quatre, cinq, six","vier, fünf, sechs","katr, ßängk, ßiss","Zahlen & Zeit"),
+  U(53,"sept, huit, neuf, dix","sieben, acht, neun, zehn","ßät, üit, nöf, diss","Zahlen & Zeit"),
+  U(54,"onze, douze","elf, zwölf","ongs, dus","Zahlen & Zeit"),
+  U(55,"vingt","zwanzig","wäng","Zahlen & Zeit"),
+  U(56,"trente / quarante / cinquante","dreißig / vierzig / fünfzig","trangt / ka-rangt / ßäng-kangt","Zahlen & Zeit"),
+  U(57,"soixante / soixante-dix","sechzig / siebzig","ßo-a-ßangt / ßo-a-ßangt-diss","Zahlen & Zeit"),
+  U(58,"quatre-vingts / quatre-vingt-dix","achtzig / neunzig","katr-wäng / katr-wäng-diss","Zahlen & Zeit"),
+  U(59,"cent / mille","hundert / tausend","ßang / mil","Zahlen & Zeit"),
+  U(60,"Quelle heure est-il ?","Wie spät ist es?","kä-lör ä-til","Zahlen & Zeit"),
+  U(61,"À quelle heure… ?","Um wie viel Uhr…?","a kä-lör","Zahlen & Zeit"),
+  U(62,"une heure / une minute","eine Stunde / eine Minute","ün ör / ün mi-nüt","Zahlen & Zeit"),
+  U(63,"le matin / l'après-midi","der Morgen / der Nachmittag","lö ma-täng / la-prä-mi-di","Zahlen & Zeit"),
+  U(64,"le soir / la nuit","der Abend / die Nacht","lö ßo-ar / la nwi","Zahlen & Zeit"),
+  U(65,"lundi, mardi, mercredi","Montag, Dienstag, Mittwoch","läng-di, mar-di, mär-krö-di","Zahlen & Zeit"),
+  U(66,"jeudi, vendredi","Donnerstag, Freitag","schö-di, wang-drö-di","Zahlen & Zeit"),
+  U(67,"samedi, dimanche","Samstag, Sonntag","ßam-di, di-mangsch","Zahlen & Zeit"),
+  U(68,"la semaine / le jour","die Woche / der Tag","la ßö-män / lö schur","Zahlen & Zeit"),
+  U(69,"Une table pour deux, s'il vous plaît","Einen Tisch für zwei, bitte","ün tabl pur dö, ßil wu plä","Restaurant"),
+  U(70,"La carte, s'il vous plaît","Die Speisekarte, bitte","la kart, ßil wu plä","Restaurant"),
+  U(71,"Qu'est-ce que vous recommandez ?","Was empfehlen Sie?","käs-kö wu rö-ko-mang-de","Restaurant"),
+  U(72,"Je voudrais commander","Ich möchte bestellen","schö wu-drä ko-mang-de","Restaurant"),
+  U(73,"Je prends…","Ich nehme…","schö prang","Restaurant"),
+  U(74,"L'addition, s'il vous plaît","Die Rechnung, bitte","la-di-ßjong, ßil wu plä","Restaurant"),
+  U(75,"C'était délicieux","Es war köstlich","ße-tä de-li-ßjö","Restaurant"),
+  U(76,"de l'eau (plate / gazeuse)","Wasser (still / mit Kohlensäure)","dö lo (plat / ga-sös)","Restaurant"),
+  U(77,"un café / un thé","ein Kaffee / ein Tee","äng ka-fe / äng te","Restaurant"),
+  U(78,"un verre de vin rouge / blanc","ein Glas Rotwein / Weißwein","äng wär dö wäng rusch / blang","Restaurant"),
+  U(79,"une bière","ein Bier","ün bjär","Restaurant"),
+  U(80,"le petit-déjeuner","das Frühstück","lö pö-ti-de-schö-ne","Restaurant"),
+  U(81,"le déjeuner / le dîner","das Mittagessen / das Abendessen","lö de-schö-ne / lö di-ne","Restaurant"),
+  U(82,"le pain","das Brot","lö päng","Restaurant"),
+  U(83,"le fromage","der Käse","lö fro-masch","Restaurant"),
+  U(84,"le poulet","das Hähnchen","lö pu-lä","Restaurant"),
+  U(85,"le poisson","der Fisch","lö po-a-ßong","Restaurant"),
+  U(86,"la viande","das Fleisch","la wjangd","Restaurant"),
+  U(87,"les légumes","das Gemüse","le le-güm","Restaurant"),
+  U(88,"les frites","die Pommes","le frit","Restaurant"),
+  U(89,"le dessert / une glace","der Nachtisch / ein Eis","lö de-ßär / ün glass","Restaurant"),
+  U(90,"Je suis végétarien(ne)","Ich bin Vegetarier(in)","schö ßwi we-sche-ta-rjäng (-riänn)","Restaurant"),
+  U(91,"Je suis allergique à…","Ich bin allergisch gegen…","schö ßwi a-lär-schik a","Restaurant"),
+  U(92,"sans gluten / sans lactose","glutenfrei / laktosefrei","ßang glü-tän / ßang lak-tos","Restaurant"),
+  U(93,"C'est à emporter ?","Ist das zum Mitnehmen?","ßä-ta ang-por-te","Restaurant"),
+  U(94,"Vous prenez la carte ?","Nehmen Sie Kartenzahlung?","wu prö-ne la kart","Restaurant"),
+  U(95,"en terrasse / à l'intérieur","auf der Terrasse / drinnen","ang tä-rass / a läng-te-rjör","Restaurant"),
+  U(96,"J'ai réservé","Ich habe reserviert","sche re-ßär-we","Restaurant"),
+  U(97,"encore un peu de…","noch etwas…","ang-kor äng pö dö","Restaurant"),
+  U(98,"le sel / le poivre","das Salz / der Pfeffer","lö ßäl / lö po-awr","Restaurant"),
+  U(99,"Santé !","Prost!","ßang-te","Restaurant"),
+  U(100,"le pourboire","das Trinkgeld","lö pur-bo-ar","Restaurant"),
+  U(101,"J'ai une réservation au nom de…","Ich habe eine Reservierung auf den Namen…","sche ün re-ßär-wa-ßjong o nong dö","Hotel"),
+  U(102,"une chambre pour deux personnes","ein Zimmer für zwei Personen","ün schangbr pur dö pär-ßonn","Hotel"),
+  U(103,"pour trois nuits","für drei Nächte","pur tro-a nwi","Hotel"),
+  U(104,"La clé, s'il vous plaît","Den Schlüssel, bitte","la kle, ßil wu plä","Hotel"),
+  U(105,"À quelle heure est le petit-déjeuner ?","Um wie viel Uhr gibt es Frühstück?","a kä-lör ä lö pö-ti-de-schö-ne","Hotel"),
+  U(106,"Le petit-déjeuner est inclus ?","Ist das Frühstück inklusive?","lö pö-ti-de-schö-ne ä-täng-klü","Hotel"),
+  U(107,"Quel est le mot de passe du wifi ?","Wie lautet das WLAN-Passwort?","kä-lä lö mo dö pass dü wi-fi","Hotel"),
+  U(108,"Il y a un problème avec…","Es gibt ein Problem mit…","il-ja äng pro-bläm a-wäk","Hotel"),
+  U(109,"la chambre","das Zimmer","la schangbr","Hotel"),
+  U(110,"la salle de bain","das Badezimmer","la ßal dö bäng","Hotel"),
+  U(111,"La douche ne marche pas","Die Dusche funktioniert nicht","la dusch nö marsch pa","Hotel"),
+  U(112,"la climatisation / le chauffage","die Klimaanlage / die Heizung","la kli-ma-ti-sa-ßjong / lö scho-fasch","Hotel"),
+  U(113,"une serviette","ein Handtuch","ün ßär-wjät","Hotel"),
+  U(114,"l'ascenseur","der Aufzug","la-ßang-ßör","Hotel"),
+  U(115,"À quelle heure est le check-out ?","Um wie viel Uhr ist der Check-out?","a kä-lör ä lö tschäk-aut","Hotel"),
+  U(116,"Vous pouvez garder mes bagages ?","Können Sie mein Gepäck aufbewahren?","wu pu-we gar-de me ba-gasch","Hotel"),
+  U(117,"la valise / le sac","der Koffer / die Tasche","la wa-lis / lö ßak","Hotel"),
+  U(118,"Vous pouvez appeler un taxi ?","Können Sie ein Taxi rufen?","wu pu-we ap-le äng tak-ßi","Hotel"),
+  U(119,"trop bruyant","zu laut","tro brüi-jang","Hotel"),
+  U(120,"une autre chambre, s'il vous plaît","ein anderes Zimmer, bitte","ün otr schangbr, ßil wu plä","Hotel"),
+  U(121,"Où sont les toilettes ?","Wo sind die Toiletten?","u ßong le to-a-lät","Wegbeschreibung"),
+  U(122,"à gauche","links","a gosch","Wegbeschreibung"),
+  U(123,"à droite","rechts","a dro-at","Wegbeschreibung"),
+  U(124,"tout droit","geradeaus","tu dro-a","Wegbeschreibung"),
+  U(125,"C'est loin ?","Ist das weit?","ßä lo-äng","Wegbeschreibung"),
+  U(126,"C'est près d'ici ?","Ist das in der Nähe?","ßä prä di-ßi","Wegbeschreibung"),
+  U(127,"la rue / la place","die Straße / der Platz","la rü / la plass","Wegbeschreibung"),
+  U(128,"le centre-ville","die Innenstadt","lö ßangtr-wil","Wegbeschreibung"),
+  U(129,"la gare","der Bahnhof","la gar","Wegbeschreibung"),
+  U(130,"l'arrêt de bus","die Bushaltestelle","la-rä dö büss","Wegbeschreibung"),
+  U(131,"le métro","die U-Bahn","lö me-tro","Wegbeschreibung"),
+  U(132,"l'aéroport","der Flughafen","la-e-ro-por","Wegbeschreibung"),
+  U(133,"la plage","der Strand","la plasch","Wegbeschreibung"),
+  U(134,"le musée","das Museum","lö mü-se","Wegbeschreibung"),
+  U(135,"l'église","die Kirche","le-glis","Wegbeschreibung"),
+  U(136,"le pont","die Brücke","lö pong","Wegbeschreibung"),
+  U(137,"au coin de la rue","an der Straßenecke","o ko-äng dö la rü","Wegbeschreibung"),
+  U(138,"la première / la deuxième rue","die erste / die zweite Straße","la prö-mjär / la dö-sjäm rü","Wegbeschreibung"),
+  U(139,"Vous pouvez me montrer sur la carte ?","Können Sie es mir auf der Karte zeigen?","wu pu-we mö mong-tre ßür la kart","Wegbeschreibung"),
+  U(140,"Je suis perdu(e)","Ich habe mich verlaufen","schö ßwi pär-dü","Wegbeschreibung"),
+  U(141,"un billet pour…, s'il vous plaît","eine Fahrkarte nach…, bitte","äng bi-jä pur …, ßil wu plä","Transport & Einkauf"),
+  U(142,"aller simple / aller-retour","einfache Fahrt / hin und zurück","a-le ßängpl / a-le rö-tur","Transport & Einkauf"),
+  U(143,"Le train part à quelle heure ?","Wann fährt der Zug ab?","lö träng par a kä-lör","Transport & Einkauf"),
+  U(144,"le quai","der Bahnsteig","lö kä","Transport & Einkauf"),
+  U(145,"Ce bus va à… ?","Fährt dieser Bus nach…?","ßö büss wa a","Transport & Einkauf"),
+  U(146,"Arrêtez-vous ici, s'il vous plaît","Halten Sie hier, bitte","a-rä-te wu i-ßi, ßil wu plä","Transport & Einkauf"),
+  U(147,"le magasin","das Geschäft","lö ma-ga-säng","Transport & Einkauf"),
+  U(148,"le marché","der Markt","lö mar-sche","Transport & Einkauf"),
+  U(149,"la boulangerie","die Bäckerei","la bu-lang-schö-ri","Transport & Einkauf"),
+  U(150,"le supermarché","der Supermarkt","lö ßü-pär-mar-sche","Transport & Einkauf"),
+  U(151,"Je regarde seulement, merci","Ich schaue nur, danke","schö rö-gard ßöl-mang, mär-ßi","Transport & Einkauf"),
+  U(152,"Je le prends","Ich nehme es","schö lö prang","Transport & Einkauf"),
+  U(153,"C'est trop cher","Das ist zu teuer","ßä tro schär","Transport & Einkauf"),
+  U(154,"en espèces / par carte","bar / mit Karte","ang-näs-päss / par kart","Transport & Einkauf"),
+  U(155,"Vous avez la monnaie ?","Haben Sie Wechselgeld?","wu-sa-we la mo-nä","Transport & Einkauf"),
+  U(156,"un ticket / un reçu","ein Ticket / ein Beleg","äng ti-kä / äng rö-ßü","Transport & Einkauf"),
+  U(157,"la taille","die Größe","la taj","Transport & Einkauf"),
+  U(158,"C'est ouvert le dimanche ?","Ist am Sonntag geöffnet?","ßä-tu-wär lö di-mangsch","Transport & Einkauf"),
+  U(159,"Au secours !","Hilfe!","o ßö-kur","Notfall"),
+  U(160,"Appelez la police !","Rufen Sie die Polizei!","ap-le la po-liss","Notfall"),
+  U(161,"Appelez une ambulance !","Rufen Sie einen Krankenwagen!","ap-le ün ang-bü-langss","Notfall"),
+  U(162,"J'ai besoin d'un médecin","Ich brauche einen Arzt","sche bö-so-äng däng med-ßäng","Notfall"),
+  U(163,"C'est urgent","Es ist dringend","ßä-tür-schang","Notfall"),
+  U(164,"Je suis malade","Ich bin krank","schö ßwi ma-lad","Notfall"),
+  U(165,"Ça fait mal ici","Es tut hier weh","ßa fä mal i-ßi","Notfall"),
+  U(166,"J'ai mal à la tête / au ventre","Ich habe Kopf- / Bauchschmerzen","sche mal a la tät / o wangtr","Notfall"),
+  U(167,"la pharmacie","die Apotheke","la far-ma-ßi","Notfall"),
+  U(168,"un médicament","ein Medikament","äng me-di-ka-mang","Notfall"),
+  U(169,"l'hôpital","das Krankenhaus","lo-pi-tal","Notfall"),
+  U(170,"J'ai perdu mon passeport","Ich habe meinen Pass verloren","sche pär-dü mong pass-por","Notfall"),
+  U(171,"J'ai perdu mon portefeuille","Ich habe mein Portemonnaie verloren","sche pär-dü mong port-föj","Notfall"),
+  U(172,"On m'a volé mon sac","Meine Tasche wurde gestohlen","ong ma wo-le mong ßak","Notfall"),
+  U(173,"Où est le commissariat ?","Wo ist die Polizeiwache?","u ä lö ko-mi-ßa-rja","Notfall"),
+  U(174,"l'ambassade / le consulat","die Botschaft / das Konsulat","lang-ba-ßad / lö kong-ßü-la","Notfall"),
+  U(175,"Attention !","Vorsicht!","a-tang-ßjong","Notfall"),
+  U(176,"Ce n'est pas grave","Das ist nicht schlimm","ßö nä pa graw","Notfall"),
+  U(177,"Je peux vous aider ?","Kann ich Ihnen helfen?","schö pö wu-sä-de","Notfall"),
+  U(178,"Laissez-moi tranquille !","Lassen Sie mich in Ruhe!","lä-ße mo-a trang-kil","Notfall"),
+  U(179,"Le numéro d'urgence, c'est le 112","Die Notrufnummer ist die 112","lö nü-me-ro dür-schangss, ßä lö ßang-dus","Notfall"),
+  U(180,"Tout va bien","Alles in Ordnung","tu wa bjäng","Notfall"),
+
+  /* ================= STAPEL 2: ALLTAG & FREUNDE (id 200–286) ================= */
+  AL(200,"Quoi de neuf ?","Was gibt's Neues?","ko-a dö nöf","Small Talk"),
+  AL(201,"Ça fait longtemps !","Lange nicht gesehen!","ßa fä long-tang","Small Talk"),
+  AL(202,"Comment tu t'appelles ?","Wie heißt du?","ko-mang tü ta-päl","Kennenlernen"),
+  AL(203,"Tu habites où ?","Wo wohnst du?","tü a-bit u","Kennenlernen"),
+  AL(204,"Tu fais quoi dans la vie ?","Was machst du beruflich?","tü fä ko-a dang la wi","Kennenlernen"),
+  AL(205,"Tu as quel âge ?","Wie alt bist du?","tü a kä-lasch","Kennenlernen"),
+  AL(206,"On se tutoie ?","Duzen wir uns?","ong ßö tü-to-a","Kennenlernen"),
+  AL(207,"Tu fais quoi ce week-end ?","Was machst du am Wochenende?","tü fä ko-a ßö wi-känd","Verabredung"),
+  AL(208,"On se voit quand ?","Wann sehen wir uns?","ong ßö wo-a kang","Verabredung"),
+  AL(209,"Ça te dit ?","Hast du Lust?","ßa tö di","Verabredung"),
+  AL(210,"Bonne idée !","Gute Idee!","bo-ni-de","Verabredung"),
+  AL(211,"Avec plaisir","Sehr gern","a-wäk plä-sir","Verabredung"),
+  AL(212,"Je ne peux pas, désolé","Ich kann nicht, tut mir leid","schö nö pö pa, de-so-le","Verabredung"),
+  AL(213,"Une autre fois","Ein andermal","ün otr fo-a","Verabredung"),
+  AL(214,"On y va ?","Gehen wir?","o-ni-wa","Verabredung"),
+  AL(215,"Je suis en retard","Ich bin spät dran","schö ßwi ang rö-tar","Verabredung"),
+  AL(216,"J'arrive !","Ich komme!","scha-riw","Verabredung"),
+  AL(217,"Attends !","Warte!","a-tang","Verabredung"),
+  AL(218,"Dépêche-toi !","Beeil dich!","de-päsch to-a","Verabredung"),
+  AL(219,"Ça marche","Geht klar","ßa marsch","Reaktionen"),
+  AL(220,"Pas de souci","Kein Problem","pa dö ßu-ßi","Reaktionen"),
+  AL(221,"T'inquiète","Mach dir keinen Kopf","täng-kjät","Reaktionen"),
+  AL(222,"C'est génial !","Das ist großartig!","ßä sche-njal","Reaktionen"),
+  AL(223,"Trop bien !","Mega gut!","tro bjäng","Reaktionen"),
+  AL(224,"C'est nul","Das ist Mist","ßä nül","Reaktionen"),
+  AL(225,"C'est dommage","Schade","ßä do-masch","Reaktionen"),
+  AL(226,"Je rigole !","Ich mach nur Spaß!","schö ri-gol","Reaktionen"),
+  AL(227,"Sérieux ?","Im Ernst?","ße-rjö","Reaktionen"),
+  AL(228,"N'importe quoi !","So ein Quatsch!","näng-port ko-a","Reaktionen"),
+  AL(229,"Tu as raison","Du hast recht","tü a rä-song","Meinung"),
+  AL(230,"Je suis d'accord","Ich bin einverstanden","schö ßwi da-kor","Meinung"),
+  AL(231,"Je ne suis pas d'accord","Ich bin nicht einverstanden","schö nö ßwi pa da-kor","Meinung"),
+  AL(232,"À mon avis…","Meiner Meinung nach…","a mo-na-wi","Meinung"),
+  AL(233,"Qu'est-ce que tu en penses ?","Was denkst du darüber?","käs-kö tü ang pangß","Meinung"),
+  AL(234,"Ça dépend","Kommt drauf an","ßa de-pang","Meinung"),
+  AL(235,"J'adore !","Ich liebe es!","scha-dor","Meinung"),
+  AL(236,"Je déteste ça","Ich hasse das","schö de-täst ßa","Meinung"),
+  AL(237,"Tu me manques","Du fehlst mir","tü mö mangk","Gefühle"),
+  AL(238,"Je t'aime","Ich liebe dich","schö täm","Gefühle"),
+  AL(239,"Bisous !","Küsschen! (Gruß am Ende)","bi-su","Grüße"),
+  AL(240,"À plus tard !","Bis später!","a plü tar","Grüße"),
+  AL(241,"À demain !","Bis morgen!","a dö-mäng","Grüße"),
+  AL(242,"À tout à l'heure !","Bis gleich!","a tu-ta-lör","Grüße"),
+  AL(243,"Bonne chance !","Viel Glück!","bon schangß","Wünsche"),
+  AL(244,"Félicitations !","Herzlichen Glückwunsch!","fe-li-ßi-ta-ßjong","Wünsche"),
+  AL(245,"Bon anniversaire !","Alles Gute zum Geburtstag!","bo-na-ni-wär-ßär","Wünsche"),
+  AL(246,"Bon appétit !","Guten Appetit!","bo-na-pe-ti","Wünsche"),
+  AL(247,"Bon courage !","Halte durch! / Viel Kraft!","bong ku-rasch","Wünsche"),
+  AL(248,"Repose-toi bien","Ruh dich gut aus","rö-pos to-a bjäng","Wünsche"),
+  AL(249,"Je suis fatigué(e)","Ich bin müde","schö ßwi fa-ti-ge","Befinden"),
+  AL(250,"J'ai faim / J'ai soif","Ich habe Hunger / Durst","sche fäng / sche ßo-af","Befinden"),
+  AL(251,"J'ai sommeil","Ich bin schläfrig","sche ßo-mäj","Befinden"),
+  AL(252,"Je suis content(e)","Ich freue mich","schö ßwi kong-tang(t)","Befinden"),
+  AL(253,"Je suis triste","Ich bin traurig","schö ßwi trist","Befinden"),
+  AL(254,"Je suis stressé(e)","Ich bin gestresst","schö ßwi strä-ße","Befinden"),
+  AL(255,"Il fait beau","Das Wetter ist schön","il fä bo","Wetter"),
+  AL(256,"Il fait chaud / froid","Es ist heiß / kalt","il fä scho / fro-a","Wetter"),
+  AL(257,"Il pleut","Es regnet","il plö","Wetter"),
+  AL(258,"Quel temps de chien !","Was für ein Sauwetter!","käl tang dö schjäng","Wetter"),
+  AL(259,"Tu peux m'aider ?","Kannst du mir helfen?","tü pö mä-de","Hilfe"),
+  AL(260,"Bien sûr que oui","Na klar","bjäng ßür kö wi","Hilfe"),
+  AL(261,"Je t'appelle plus tard","Ich rufe dich später an","schö ta-päl plü tar","Telefon & Chat"),
+  AL(262,"Envoie-moi un message","Schick mir eine Nachricht","ang-wo-a mo-a äng mä-ßasch","Telefon & Chat"),
+  AL(263,"C'est quoi ton numéro ?","Wie ist deine Nummer?","ßä ko-a tong nü-me-ro","Telefon & Chat"),
+  AL(264,"Tu es sur WhatsApp ?","Bist du bei WhatsApp?","tü ä ßür WhatsApp","Telefon & Chat"),
+  AL(265,"mon ami / ma copine","mein Freund / meine Freundin","mo-na-mi / ma ko-pin","Menschen"),
+  AL(266,"mon pote","mein Kumpel","mong pot","Menschen"),
+  AL(267,"la famille","die Familie","la fa-mij","Menschen"),
+  AL(268,"mon frère / ma sœur","mein Bruder / meine Schwester","mong frär / ma ßör","Menschen"),
+  AL(269,"mes parents","meine Eltern","me pa-rang","Menschen"),
+  AL(270,"les enfants","die Kinder","le-sang-fang","Menschen"),
+  AL(271,"le travail / le boulot","die Arbeit / der Job (umg.)","lö tra-waj / lö bu-lo","Leben"),
+  AL(272,"les vacances","die Ferien / der Urlaub","le wa-kangß","Leben"),
+  AL(273,"J'aime bien…","Ich mag…","schäm bjäng","Hobbys"),
+  AL(274,"mon passe-temps préféré","mein Lieblingshobby","mong pass-tang pre-fe-re","Hobbys"),
+  AL(275,"faire du sport","Sport machen","fär dü ßpor","Hobbys"),
+  AL(276,"écouter de la musique","Musik hören","e-ku-te dö la mü-sik","Hobbys"),
+  AL(277,"regarder un film","einen Film schauen","rö-gar-de äng film","Hobbys"),
+  AL(278,"On prend un verre ?","Trinken wir was?","ong prang äng wär","Ausgehen"),
+  AL(279,"C'est ma tournée !","Diese Runde geht auf mich!","ßä ma tur-ne","Ausgehen"),
+  AL(280,"Tu viens avec nous ?","Kommst du mit?","tü wjäng a-wäk nu","Ausgehen"),
+  AL(281,"Je dois y aller","Ich muss los","schö do-a i a-le","Ausgehen"),
+  AL(282,"Bref…","Kurz gesagt… / na ja…","bräf","Füllwörter"),
+  AL(283,"Du coup…","Deshalb… / also… (Füllwort)","dü ku","Füllwörter"),
+  AL(284,"Carrément !","Total! / Voll und ganz!","ka-re-mang","Füllwörter"),
+  AL(285,"C'était super !","Das war super!","ße-tä ßü-pär","Reaktionen"),
+  AL(286,"Prends soin de toi","Pass auf dich auf","prang ßo-äng dö to-a","Wünsche"),
+
+  /* ================= STAPEL 3: TOP 200 (id 300–499) =================
+     300–399: die 100 häufigsten Wörter (Frequenzlisten-Kern)
+     400–499: die 100 häufigsten Alltagssätze (gesprochene Sprache)  */
+  T(300,"le / la / les","der / die / das (Artikel)","lö / la / le","Top-100 Wörter"),
+  T(301,"de","von","dö","Top-100 Wörter"),
+  T(302,"un / une","ein / eine","äng / ün","Top-100 Wörter"),
+  T(303,"et","und","e","Top-100 Wörter"),
+  T(304,"être","sein","ätr","Top-100 Wörter"),
+  T(305,"avoir","haben","a-wo-ar","Top-100 Wörter"),
+  T(306,"que","dass / was","kö","Top-100 Wörter"),
+  T(307,"à","zu / in / an","a","Top-100 Wörter"),
+  T(308,"je","ich","schö","Top-100 Wörter"),
+  T(309,"tu","du","tü","Top-100 Wörter"),
+  T(310,"il / elle","er / sie","il / äl","Top-100 Wörter"),
+  T(311,"nous","wir","nu","Top-100 Wörter"),
+  T(312,"vous","ihr / Sie","wu","Top-100 Wörter"),
+  T(313,"ils / elles","sie (Mehrzahl)","il / äl","Top-100 Wörter"),
+  T(314,"ne … pas","nicht","nö … pa","Top-100 Wörter"),
+  T(315,"ce / cette","dieser / diese","ßö / ßät","Top-100 Wörter"),
+  T(316,"dans","in (drinnen)","dang","Top-100 Wörter"),
+  T(317,"en","in / davon","ang","Top-100 Wörter"),
+  T(318,"du / de la","vom / etwas (Teilungsartikel)","dü / dö la","Top-100 Wörter"),
+  T(319,"pour","für","pur","Top-100 Wörter"),
+  T(320,"sur","auf","ßür","Top-100 Wörter"),
+  T(321,"se","sich","ßö","Top-100 Wörter"),
+  T(322,"plus","mehr","plü(ß)","Top-100 Wörter"),
+  T(323,"pouvoir","können","pu-wo-ar","Top-100 Wörter"),
+  T(324,"faire","machen","fär","Top-100 Wörter"),
+  T(325,"dire","sagen","dir","Top-100 Wörter"),
+  T(326,"aller","gehen","a-le","Top-100 Wörter"),
+  T(327,"voir","sehen","wo-ar","Top-100 Wörter"),
+  T(328,"savoir","wissen","ßa-wo-ar","Top-100 Wörter"),
+  T(329,"vouloir","wollen","wu-lo-ar","Top-100 Wörter"),
+  T(330,"venir","kommen","wö-nir","Top-100 Wörter"),
+  T(331,"devoir","müssen","dö-wo-ar","Top-100 Wörter"),
+  T(332,"prendre","nehmen","prangdr","Top-100 Wörter"),
+  T(333,"trouver","finden","tru-we","Top-100 Wörter"),
+  T(334,"donner","geben","do-ne","Top-100 Wörter"),
+  T(335,"il faut","man muss / es ist nötig","il fo","Top-100 Wörter"),
+  T(336,"parler","sprechen","par-le","Top-100 Wörter"),
+  T(337,"mettre","setzen / stellen / legen","mätr","Top-100 Wörter"),
+  T(338,"passer","vorbeigehen / verbringen","pa-ße","Top-100 Wörter"),
+  T(339,"demander","fragen / bitten","dö-mang-de","Top-100 Wörter"),
+  T(340,"rester","bleiben","räs-te","Top-100 Wörter"),
+  T(341,"penser","denken","pang-ße","Top-100 Wörter"),
+  T(342,"aimer","lieben / mögen","ä-me","Top-100 Wörter"),
+  T(343,"croire","glauben","kro-ar","Top-100 Wörter"),
+  T(344,"attendre","warten","a-tangdr","Top-100 Wörter"),
+  T(345,"comprendre","verstehen","kong-prangdr","Top-100 Wörter"),
+  T(346,"sortir","hinausgehen / ausgehen","ßor-tir","Top-100 Wörter"),
+  T(347,"partir","abfahren / weggehen","par-tir","Top-100 Wörter"),
+  T(348,"arriver","ankommen","a-ri-we","Top-100 Wörter"),
+  T(349,"connaître","kennen","ko-nätr","Top-100 Wörter"),
+  T(350,"mais","aber","mä","Top-100 Wörter"),
+  T(351,"ou","oder","u","Top-100 Wörter"),
+  T(352,"si","wenn / ob / doch","ßi","Top-100 Wörter"),
+  T(353,"comme","wie / da","kom","Top-100 Wörter"),
+  T(354,"aussi","auch","o-ßi","Top-100 Wörter"),
+  T(355,"bien","gut (Adverb)","bjäng","Top-100 Wörter"),
+  T(356,"très","sehr","trä","Top-100 Wörter"),
+  T(357,"tout / toute","ganz / alles","tu / tut","Top-100 Wörter"),
+  T(358,"même","sogar / selbst / gleich","mäm","Top-100 Wörter"),
+  T(359,"encore","noch / nochmal","ang-kor","Top-100 Wörter"),
+  T(360,"déjà","schon","de-scha","Top-100 Wörter"),
+  T(361,"toujours","immer","tu-schur","Top-100 Wörter"),
+  T(362,"jamais","nie","scha-mä","Top-100 Wörter"),
+  T(363,"beaucoup","viel","bo-ku","Top-100 Wörter"),
+  T(364,"peu","wenig","pö","Top-100 Wörter"),
+  T(365,"trop","zu (viel)","tro","Top-100 Wörter"),
+  T(366,"alors","also / dann","a-lor","Top-100 Wörter"),
+  T(367,"après","nach / danach","a-prä","Top-100 Wörter"),
+  T(368,"avant","vor / vorher","a-wang","Top-100 Wörter"),
+  T(369,"puis","dann","pwi","Top-100 Wörter"),
+  T(370,"quelque(s)","einige / etwas","käl-kö","Top-100 Wörter"),
+  T(371,"autre","andere(r/s)","otr","Top-100 Wörter"),
+  T(372,"chose","Sache / Ding","schos","Top-100 Wörter"),
+  T(373,"quelque chose","etwas","käl-kö schos","Top-100 Wörter"),
+  T(374,"rien","nichts","ri-äng","Top-100 Wörter"),
+  T(375,"temps","Zeit / Wetter","tang","Top-100 Wörter"),
+  T(376,"jour","Tag","schur","Top-100 Wörter"),
+  T(377,"an / année","Jahr","ang / a-ne","Top-100 Wörter"),
+  T(378,"homme / femme","Mann / Frau","om / fam","Top-100 Wörter"),
+  T(379,"enfant","Kind","ang-fang","Top-100 Wörter"),
+  T(380,"monde","Welt / Leute","mongd","Top-100 Wörter"),
+  T(381,"vie","Leben","wi","Top-100 Wörter"),
+  T(382,"fois","Mal","fo-a","Top-100 Wörter"),
+  T(383,"main","Hand","mäng","Top-100 Wörter"),
+  T(384,"tête","Kopf","tät","Top-100 Wörter"),
+  T(385,"yeux","Augen","jö","Top-100 Wörter"),
+  T(386,"maison","Haus","mä-song","Top-100 Wörter"),
+  T(387,"ville","Stadt","wil","Top-100 Wörter"),
+  T(388,"pays","Land","pä-i","Top-100 Wörter"),
+  T(389,"eau","Wasser","o","Top-100 Wörter"),
+  T(390,"père / mère","Vater / Mutter","pär / mär","Top-100 Wörter"),
+  T(391,"ami(e)","Freund(in)","a-mi","Top-100 Wörter"),
+  T(392,"moi / toi","ich / du (betont)","mo-a / to-a","Top-100 Wörter"),
+  T(393,"lui / eux","er,ihm / sie (betont, Mz.)","lüi / ö","Top-100 Wörter"),
+  T(394,"mon / ma / mes","mein(e)","mong / ma / me","Top-100 Wörter"),
+  T(395,"ton / ta / tes","dein(e)","tong / ta / te","Top-100 Wörter"),
+  T(396,"son / sa / ses","sein(e) / ihr(e)","ßong / ßa / ße","Top-100 Wörter"),
+  T(397,"notre / votre / leur","unser / euer / ihr","notr / wotr / lör","Top-100 Wörter"),
+  T(398,"qui","wer / der, die, das","ki","Top-100 Wörter"),
+  T(399,"quoi","was","ko-a","Top-100 Wörter"),
+  T(400,"Je ne sais pas","Ich weiß nicht","schö nö ßä pa (gespr.: schä pa)","Top-100 Sätze"),
+  T(401,"Ça va ?","Alles gut?","ßa wa","Top-100 Sätze"),
+  T(402,"Ça va bien","Mir geht's gut","ßa wa bjäng","Top-100 Sätze"),
+  T(403,"Qu'est-ce que c'est ?","Was ist das?","käs-kö ßä","Top-100 Sätze"),
+  T(404,"Qu'est-ce que tu fais ?","Was machst du?","käs-kö tü fä","Top-100 Sätze"),
+  T(405,"Je ne comprends pas","Ich verstehe nicht","schö nö kong-prang pa","Top-100 Sätze"),
+  T(406,"C'est bon","Das passt / alles gut","ßä bong","Top-100 Sätze"),
+  T(407,"C'est bien","Das ist gut","ßä bjäng","Top-100 Sätze"),
+  T(408,"C'est vrai","Das stimmt","ßä wrä","Top-100 Sätze"),
+  T(409,"C'est pas vrai !","Das gibt's doch nicht!","ßä pa wrä","Top-100 Sätze"),
+  T(410,"Je suis désolé(e)","Es tut mir leid","schö ßwi de-so-le","Top-100 Sätze"),
+  T(411,"Ce n'est pas grave","Nicht schlimm","ßö nä pa graw","Top-100 Sätze"),
+  T(412,"Il n'y a pas de problème","Kein Problem","il nja pa dö pro-bläm","Top-100 Sätze"),
+  T(413,"Je t'aime","Ich liebe dich","schö täm","Top-100 Sätze"),
+  T(414,"Tu me manques","Du fehlst mir","tü mö mangk","Top-100 Sätze"),
+  T(415,"J'ai faim","Ich habe Hunger","sche fäng","Top-100 Sätze"),
+  T(416,"J'ai soif","Ich habe Durst","sche ßo-af","Top-100 Sätze"),
+  T(417,"Je suis fatigué(e)","Ich bin müde","schö ßwi fa-ti-ge","Top-100 Sätze"),
+  T(418,"Il est quelle heure ?","Wie spät ist es?","i-lä kä-lör","Top-100 Sätze"),
+  T(419,"Où es-tu ?","Wo bist du?","u ä tü","Top-100 Sätze"),
+  T(420,"J'arrive","Ich komme (gleich)","scha-riw","Top-100 Sätze"),
+  T(421,"Attends-moi","Warte auf mich","a-tang mo-a","Top-100 Sätze"),
+  T(422,"Viens ici","Komm her","wjäng i-ßi","Top-100 Sätze"),
+  T(423,"Allons-y !","Los geht's!","a-long-si","Top-100 Sätze"),
+  T(424,"On y va","Auf geht's / wir gehen","o-ni-wa","Top-100 Sätze"),
+  T(425,"Je dois partir","Ich muss gehen","schö do-a par-tir","Top-100 Sätze"),
+  T(426,"À tout à l'heure","Bis gleich","a tu-ta-lör","Top-100 Sätze"),
+  T(427,"À bientôt","Bis bald","a bjäng-to","Top-100 Sätze"),
+  T(428,"Bonne nuit","Gute Nacht","bon nwi","Top-100 Sätze"),
+  T(429,"Fais attention","Pass auf","fä a-tang-ßjong","Top-100 Sätze"),
+  T(430,"Aide-moi","Hilf mir","äd mo-a","Top-100 Sätze"),
+  T(431,"Regarde !","Schau!","rö-gard","Top-100 Sätze"),
+  T(432,"Écoute-moi","Hör mir zu","e-kut mo-a","Top-100 Sätze"),
+  T(433,"Dis-moi","Sag mir","di mo-a","Top-100 Sätze"),
+  T(434,"Je pense que oui","Ich denke ja","schö pangß kö wi","Top-100 Sätze"),
+  T(435,"Je pense que non","Ich denke nein","schö pangß kö nong","Top-100 Sätze"),
+  T(436,"Je crois","Ich glaube","schö kro-a","Top-100 Sätze"),
+  T(437,"Peut-être","Vielleicht","pö-tätr","Top-100 Sätze"),
+  T(438,"Bien sûr","Natürlich","bjäng ßür","Top-100 Sätze"),
+  T(439,"Pas du tout","Überhaupt nicht","pa dü tu","Top-100 Sätze"),
+  T(440,"Moi aussi","Ich auch","mo-a o-ßi","Top-100 Sätze"),
+  T(441,"Moi non plus","Ich auch nicht","mo-a nong plü","Top-100 Sätze"),
+  T(442,"C'est à moi / à toi","Ich bin dran / du bist dran","ßä-ta mo-a / a to-a","Top-100 Sätze"),
+  T(443,"Qu'est-ce qui se passe ?","Was ist los?","käs-ki ßö pass","Top-100 Sätze"),
+  T(444,"Qu'est-ce qu'il y a ?","Was gibt's? / Was ist?","käs-kil-ja","Top-100 Sätze"),
+  T(445,"Ça suffit !","Es reicht!","ßa ßü-fi","Top-100 Sätze"),
+  T(446,"Laisse tomber","Vergiss es","läss tong-be","Top-100 Sätze"),
+  T(447,"C'est parti !","Los geht's!","ßä par-ti","Top-100 Sätze"),
+  T(448,"Pas encore","Noch nicht","pa sang-kor","Top-100 Sätze"),
+  T(449,"Pas maintenant","Nicht jetzt","pa mängt-nang","Top-100 Sätze"),
+  T(450,"Un moment, s'il te plaît","Einen Moment, bitte","äng mo-mang, ßil tö plä","Top-100 Sätze"),
+  T(451,"Comme tu veux","Wie du willst","kom tü wö","Top-100 Sätze"),
+  T(452,"Si tu veux","Wenn du willst","ßi tü wö","Top-100 Sätze"),
+  T(453,"Je veux bien","Gerne / einverstanden","schö wö bjäng","Top-100 Sätze"),
+  T(454,"Je n'ai pas le temps","Ich habe keine Zeit","schö ne pa lö tang","Top-100 Sätze"),
+  T(455,"J'ai oublié","Ich habe es vergessen","sche u-bli-e","Top-100 Sätze"),
+  T(456,"Je me souviens","Ich erinnere mich","schö mö ßu-wjäng","Top-100 Sätze"),
+  T(457,"C'est important","Das ist wichtig","ßä äng-por-tang","Top-100 Sätze"),
+  T(458,"C'est facile / difficile","Das ist leicht / schwer","ßä fa-ßil / di-fi-ßil","Top-100 Sätze"),
+  T(459,"C'est drôle","Das ist lustig","ßä drol","Top-100 Sätze"),
+  T(460,"C'est incroyable","Das ist unglaublich","ßä äng-kro-a-jabl","Top-100 Sätze"),
+  T(461,"Quelle bonne surprise !","Was für eine Überraschung!","käl bon ßür-pris","Top-100 Sätze"),
+  T(462,"Tout va bien","Alles in Ordnung","tu wa bjäng","Top-100 Sätze"),
+  T(463,"Il fait beau aujourd'hui","Heute ist schönes Wetter","il fä bo o-schur-dwi","Top-100 Sätze"),
+  T(464,"Qu'est-ce que tu veux ?","Was willst du?","käs-kö tü wö","Top-100 Sätze"),
+  T(465,"Qu'est-ce que tu en dis ?","Was sagst du dazu?","käs-kö tü ang di","Top-100 Sätze"),
+  T(466,"Comment ça marche ?","Wie funktioniert das?","ko-mang ßa marsch","Top-100 Sätze"),
+  T(467,"Ça ne marche pas","Das funktioniert nicht","ßa nö marsch pa","Top-100 Sätze"),
+  T(468,"J'en ai besoin","Ich brauche es","schang-ne bö-so-äng","Top-100 Sätze"),
+  T(469,"Il me faut…","Ich brauche…","il mö fo","Top-100 Sätze"),
+  T(470,"Ça coûte combien ?","Was kostet das?","ßa kut kong-bjäng","Top-100 Sätze"),
+  T(471,"C'est combien ?","Wie viel macht das?","ßä kong-bjäng","Top-100 Sätze"),
+  T(472,"Je peux ?","Darf ich?","schö pö","Top-100 Sätze"),
+  T(473,"Tu peux répéter ?","Kannst du das wiederholen?","tü pö re-pe-te","Top-100 Sätze"),
+  T(474,"Parle plus fort","Sprich lauter","parl plü for","Top-100 Sätze"),
+  T(475,"Moins vite, s'il te plaît","Langsamer, bitte","mo-äng wit, ßil tö plä","Top-100 Sätze"),
+  T(476,"Qu'est-ce que ça veut dire ?","Was bedeutet das?","käs-kö ßa wö dir","Top-100 Sätze"),
+  T(477,"Comment on dit … en français ?","Wie sagt man … auf Französisch?","ko-mang ong di … ang frang-ßä","Top-100 Sätze"),
+  T(478,"Je parle un peu français","Ich spreche ein bisschen Französisch","schö parl äng pö frang-ßä","Top-100 Sätze"),
+  T(479,"J'apprends le français","Ich lerne Französisch","scha-prang lö frang-ßä","Top-100 Sätze"),
+  T(480,"On verra","Mal sehen","ong wä-ra","Top-100 Sätze"),
+  T(481,"Ça m'est égal","Das ist mir egal","ßa mä-te-gal","Top-100 Sätze"),
+  T(482,"J'en ai marre","Ich hab die Nase voll","schang-ne mar","Top-100 Sätze"),
+  T(483,"Tant pis","Macht nichts / Pech","tang pi","Top-100 Sätze"),
+  T(484,"Tant mieux","Umso besser","tang mjö","Top-100 Sätze"),
+  T(485,"D'accord, pas de problème","Okay, kein Problem","da-kor, pa dö pro-bläm","Top-100 Sätze"),
+  T(486,"Je suis là","Ich bin da","schö ßwi la","Top-100 Sätze"),
+  T(487,"Il est là ?","Ist er da?","i-lä la","Top-100 Sätze"),
+  T(488,"Qui est-ce ?","Wer ist das?","ki äss","Top-100 Sätze"),
+  T(489,"C'est moi","Ich bin's","ßä mo-a","Top-100 Sätze"),
+  T(490,"Entrez !","Herein!","ang-tre","Top-100 Sätze"),
+  T(491,"Asseyez-vous","Setzen Sie sich","a-ße-je wu","Top-100 Sätze"),
+  T(492,"Servez-vous","Bedienen Sie sich","ßär-we wu","Top-100 Sätze"),
+  T(493,"À table !","Essen ist fertig!","a tabl","Top-100 Sätze"),
+  T(494,"J'ai hâte !","Ich kann's kaum erwarten!","sche at","Top-100 Sätze"),
+  T(495,"Profite bien !","Genieß es!","pro-fit bjäng","Top-100 Sätze"),
+  T(496,"Bon voyage !","Gute Reise!","bong wo-a-jasch","Top-100 Sätze"),
+  T(497,"Bonne route !","Gute Fahrt!","bon rut","Top-100 Sätze"),
+  T(498,"Reviens vite","Komm bald wieder","rö-wjäng wit","Top-100 Sätze"),
+  T(499,"Merci pour tout","Danke für alles","mär-ßi pur tu","Top-100 Sätze"),
+
+  /* ================= STAPEL 4: AUSSPRACHE-REGELN (id 600–635) =================
+     Vorderseite = Regel-Frage · Rückseite = Beispiele + Regel  */
+  R(600,"grand · petit · vous · Paris","Regel: Wie klingen d, t, s, x am WORTENDE? (grand, petit, vous, Paris)","grang · pö-ti · wu · pa-ri — Endkonsonanten meist STUMM"),
+  R(601,"avec · bonjour · neuf · hôtel","Ausnahme: Welche Endkonsonanten spricht man MEIST doch? (avec, bonjour, neuf, hôtel)","a-wäk · bong-schur · nöf · o-täl — c, r, f, l (Merkwort: engl. „CaReFuL“)"),
+  R(602,"parler · manger · aller","Regel: Wie klingt -er am Verb-Ende? (parler, manger, aller)","par-le · mang-sche · a-le — „-er“ = e (r stumm)"),
+  R(603,"table · France · madame","Regel: Wie klingt das e am WORTENDE? (table, France, madame)","tabl · frangß · ma-dam — End-e ist STUMM"),
+  R(604,"hôtel · heure · huit","Regel: Wie klingt das h? (hôtel, heure, huit)","o-täl · ör · üit — h ist IMMER stumm"),
+  R(605,"vous · bonjour · ou","Regel: Wie klingt „ou“? (vous, bonjour, ou)","u — wu · bong-schur · u"),
+  R(606,"tu · rue · salut","Regel: Wie klingt das alleinstehende „u“? (tu, rue, salut)","ü — tü · rü · ßa-lü"),
+  R(607,"moi · trois · voir","Regel: Wie klingt „oi“? (moi, trois, voir)","o-a / wa — mo-a · tro-a · wo-ar"),
+  R(608,"au · beau · gâteau","Regel: Wie klingen „au“ und „eau“? (au, beau, gâteau)","o — o · bo · ga-to"),
+  R(609,"deux · peu · sœur","Regel: Wie klingen „eu“ und „œu“? (deux, peu, sœur)","ö — dö · pö · ßör"),
+  R(610,"j'ai · maison · treize","Regel: Wie klingen „ai“ und „ei“? (j'ai, maison, treize)","ä / e — sche · mä-song · träs"),
+  R(611,"café · été · réservé","Regel: Wie klingt „é“ (mit Strich nach oben)? (café, été, réservé)","geschlossenes e — ka-fe · e-te · re-ßär-we"),
+  R(612,"père · être · fenêtre","Regel: Wie klingen „è“ und „ê“? (père, être, fenêtre)","offenes ä — pär · ätr · fö-nätr"),
+  R(613,"bon · non · nom","Nasal 1: Wie klingen „on“ und „om“? (bon, non, nom)","ong (nasal, g nicht sprechen) — bong · nong"),
+  R(614,"France · temps · comment","Nasal 2: Wie klingen „an, en, am, em“? (France, temps, comment)","ang (nasal) — frangß · tang · ko-mang"),
+  R(615,"vin · pain · plein","Nasal 3: Wie klingen „in, ain, ein“? (vin, pain, plein)","äng (nasal) — wäng · päng · pläng"),
+  R(616,"un · lundi · parfum","Nasal 4: Wie klingt „un“? (un, lundi, parfum)","äng/öng (nasal) — äng · läng-di · par-fäng"),
+  R(617,"bon → bonne · an → année","Wichtig: Was passiert mit dem Nasal, wenn ein Vokal oder Doppelkonsonant folgt? (bon→bonne)","KEIN Nasal mehr: bong → bonn · ang → a-ne"),
+  R(618,"chambre · chercher · chaud","Regel: Wie klingt „ch“? (chambre, chercher, chaud)","hartes sch (wie dt. „Schule“) — schangbr · schär-sche · scho"),
+  R(619,"je · bonjour · déjà","Regel: Wie klingt „j“? (je, bonjour, déjà)","WEICHES sch (wie „Garage“) — schö · bong-schur · de-scha"),
+  R(620,"gare vs. général · plage","Regel: Wann ist „g“ hart, wann weich? (gare vs. général, plage)","vor e/i weiches sch: sche-ne-ral, plasch — sonst hart: gar"),
+  R(621,"cent · ici · merci","Regel: Wie klingt „c“ vor e und i? (cent, ici, merci)","ß — ßang · i-ßi · mär-ßi"),
+  R(622,"café · français · ça","Regel: Wie klingt „c“ sonst — und was macht das Häkchen (ç)? (café, français, ça)","c = k: ka-fe — ç = IMMER ß: frang-ßä · ßa"),
+  R(623,"qui · quatre · musique","Regel: Wie klingt „qu“? (qui, quatre, musique)","k (u stumm) — ki · katr · mü-sik"),
+  R(624,"champagne · Allemagne · gagner","Regel: Wie klingt „gn“? (champagne, Allemagne)","nj (wie „Kognak“) — schang-pann-jö · al-mann-jö"),
+  R(625,"famille · fille · travail","Regel: Wie klingt „ill / il“ nach Vokal? (famille, fille, travail)","j — fa-mij · fij · tra-waj"),
+  R(626,"ville · mille · tranquille","Ausnahmen: In welchen Wörtern bleibt „ill“ ein L? (ville, mille, tranquille)","l bleibt l — wil · mil · trang-kil"),
+  R(627,"voyage · payer · essayer","Regel: Wie klingen „oy / ay“ vor Vokal? (voyage, payer)","o-a-j / ä-j — wo-a-jasch · pä-je"),
+  R(628,"maison · désolé · choisir","Regel: Wie klingt ein einzelnes „s“ ZWISCHEN Vokalen? (maison, désolé)","stimmhaftes s (wie dt. „Rose“) — mä-song · de-so-le"),
+  R(629,"poisson vs. poison","Der berühmte Unterschied: poisson (Fisch) vs. poison (Gift)?","ss = ß, s = weiches s: po-a-ßong (Fisch) / po-a-song (Gift)"),
+  R(630,"ils parlent · ils aiment","Regel: Wie klingt die Verb-Endung „-ent“? (ils parlent, ils aiment)","VÖLLIG STUMM — il parl · il-säm"),
+  R(631,"vous avez · les amis · un homme","Liaison: Was passiert mit stummen Endkonsonanten vor Vokal? (vous avez, les amis)","Sie werden gebunden: wu-sa-we · le-sa-mi · äng-nom"),
+  R(632,"restaurant · université · important","Regel: Auf welcher Silbe liegt IMMER die Betonung?","auf der LETZTEN: räs-to-RANG · ü-ni-wär-ßi-TE"),
+  R(633,"rue · Paris · merci","Regel: Wie spricht man das französische „r“? (rue, Paris, merci)","Rachen-r wie im Deutschen („rot“), nie gerollt — rü · pa-ri"),
+  R(634,"loin · moins · point","Regel: Wie klingt „oin“? (loin, moins, point)","o-äng (nasal) — lo-äng · mo-äng · po-äng"),
+  R(635,"attention · addition · réservation","Regel: Wie klingt „-tion“? (attention, addition)","ßjong — a-tang-ßjong · a-di-ßjong (t wird zu ß!)"),
+
+  /* ================= STAPEL 5: KOGNATEN (id 700–899) =================
+     Französische Wörter, die fast identisch sind mit Wörtern aus
+     Griechisch (700–745), Englisch (746–825) oder Deutsch (826–899).
+     Die „Brücke" steht auf der Rückseite als Gedächtnisanker.        */
+  KG(700,"la philosophie","die Philosophie","fi-lo-so-fi","gr. φιλοσοφία"),
+  KG(701,"le théâtre","das Theater","te-atr","gr. θέατρο"),
+  KG(702,"la politique","die Politik","po-li-tik","gr. πολιτική"),
+  KG(703,"l'économie","die Wirtschaft","le-ko-no-mi","gr. οικονομία"),
+  KG(704,"la démocratie","die Demokratie","de-mo-kra-ßi","gr. δημοκρατία"),
+  KG(705,"le problème","das Problem","pro-bläm","gr. πρόβλημα"),
+  KG(706,"le système","das System","ßis-täm","gr. σύστημα"),
+  KG(707,"la musique","die Musik","mü-sik","gr. μουσική"),
+  KG(708,"le téléphone","das Telefon","te-le-fon","gr. τηλέφωνο"),
+  KG(709,"la photo","das Foto","fo-to","gr. φωτογραφία"),
+  KG(710,"le programme","das Programm","pro-gram","gr. πρόγραμμα"),
+  KG(711,"l'histoire","die Geschichte","lis-to-ar","gr. ιστορία"),
+  KG(712,"l'idée","die Idee","li-de","gr. ιδέα"),
+  KG(713,"l'énergie","die Energie","le-när-schi","gr. ενέργεια"),
+  KG(714,"la période","der Zeitraum","pe-rjod","gr. περίοδος"),
+  KG(715,"la méthode","die Methode","me-tod","gr. μέθοδος"),
+  KG(716,"le mythe","der Mythos","mit","gr. μύθος"),
+  KG(717,"le climat","das Klima","kli-ma","gr. κλίμα"),
+  KG(718,"la pharmacie","die Apotheke","far-ma-ßi","gr. φαρμακείο"),
+  KG(719,"l'église","die Kirche","le-glis","gr. εκκλησία"),
+  KG(720,"la catastrophe","die Katastrophe","ka-tas-trof","gr. καταστροφή"),
+  KG(721,"le kilomètre","der Kilometer","ki-lo-mätr","gr. χιλιόμετρο"),
+  KG(722,"le centre","das Zentrum","ßangtr","gr. κέντρο"),
+  KG(723,"le caractère","der Charakter","ka-rak-tär","gr. χαρακτήρας"),
+  KG(724,"le paradis","das Paradies","pa-ra-di","gr. παράδεισος"),
+  KG(725,"la planète","der Planet","pla-nät","gr. πλανήτης"),
+  KG(726,"la thérapie","die Therapie","te-ra-pi","gr. θεραπεία"),
+  KG(727,"la biologie","die Biologie","bjo-lo-schi","gr. βιολογία"),
+  KG(728,"la technologie","die Technologie","täk-no-lo-schi","gr. τεχνολογία"),
+  KG(729,"le stade","das Stadion","ßtad","gr. στάδιο"),
+  KG(730,"l'athlète","der Athlet","lat-lät","gr. αθλητής"),
+  KG(731,"le cinéma","das Kino","ßi-ne-ma","gr. σινεμά / κίνημα"),
+  KG(732,"le drame","das Drama","dram","gr. δράμα"),
+  KG(733,"la scène","die Bühne / Szene","ßän","gr. σκηνή"),
+  KG(734,"le chaos","das Chaos","ka-o","gr. χάος"),
+  KG(735,"la crise","die Krise","kris","gr. κρίση"),
+  KG(736,"l'analyse","die Analyse","la-na-lis","gr. ανάλυση"),
+  KG(737,"le symbole","das Symbol","ßäng-bol","gr. σύμβολο"),
+  KG(738,"le rythme","der Rhythmus","ritm","gr. ρυθμός"),
+  KG(739,"la zone","die Zone","son","gr. ζώνη"),
+  KG(740,"l'organe","das Organ","lor-gan","gr. όργανο"),
+  KG(741,"le type","der Typ","tip","gr. τύπος"),
+  KG(742,"la phrase","der Satz","fras","gr. φράση"),
+  KG(743,"la géographie","die Geografie","sche-o-gra-fi","gr. γεωγραφία"),
+  KG(744,"les mathématiques","die Mathematik","ma-te-ma-tik","gr. μαθηματικά"),
+  KG(745,"la physique","die Physik","fi-sik","gr. φυσική"),
+  KE(746,"important","wichtig","äng-por-tang","engl. important"),
+  KE(747,"différent","verschieden","di-fe-rang","engl. different"),
+  KE(748,"possible","möglich","po-ßibl","engl. possible"),
+  KE(749,"impossible","unmöglich","äng-po-ßibl","engl. impossible"),
+  KE(750,"le moment","der Moment","mo-mang","engl. moment"),
+  KE(751,"la question","die Frage","käs-tjong","engl. question"),
+  KE(752,"l'information","die Information","läng-for-ma-ßjong","engl. information"),
+  KE(753,"la solution","die Lösung","ßo-lü-ßjong","engl. solution"),
+  KE(754,"la situation","die Situation","ßi-tü-a-ßjong","engl. situation"),
+  KE(755,"la décision","die Entscheidung","de-ßi-sjong","engl. decision"),
+  KE(756,"l'action","die Handlung","lak-ßjong","engl. action"),
+  KE(757,"l'attention","die Aufmerksamkeit","la-tang-ßjong","engl. attention"),
+  KE(758,"la direction","die Richtung","di-räk-ßjong","engl. direction"),
+  KE(759,"la conversation","das Gespräch","kong-wär-ßa-ßjong","engl. conversation"),
+  KE(760,"l'invitation","die Einladung","läng-wi-ta-ßjong","engl. invitation"),
+  KE(761,"la tradition","die Tradition","tra-di-ßjong","engl. tradition"),
+  KE(762,"la condition","die Bedingung","kong-di-ßjong","engl. condition"),
+  KE(763,"le train","der Zug","träng","engl. train"),
+  KE(764,"le bus","der Bus","büss","engl. bus"),
+  KE(765,"le taxi","das Taxi","tak-ßi","engl. taxi"),
+  KE(766,"le passeport","der Reisepass","pass-por","engl. passport"),
+  KE(767,"le touriste","der Tourist","tu-rist","engl. tourist"),
+  KE(768,"la police","die Polizei","po-liss","engl. police"),
+  KE(769,"le président","der Präsident","pre-si-dang","engl. president"),
+  KE(770,"la banque","die Bank","bangk","engl. bank"),
+  KE(771,"la carte","die Karte","kart","engl. card"),
+  KE(772,"le message","die Nachricht","mä-ßasch","engl. message"),
+  KE(773,"le week-end","das Wochenende","wi-känd","engl. weekend"),
+  KE(774,"le parking","der Parkplatz","par-king","engl. parking"),
+  KE(775,"le shopping","das Einkaufen","scho-ping","engl. shopping"),
+  KE(776,"le sport","der Sport","ßpor","engl. sport"),
+  KE(777,"le football","der Fußball","fut-bol","engl. football"),
+  KE(778,"le tennis","das Tennis","te-niss","engl. tennis"),
+  KE(779,"le film","der Film","film","engl. film"),
+  KE(780,"la radio","das Radio","ra-djo","engl. radio"),
+  KE(781,"la télévision","das Fernsehen","te-le-wi-sjong","engl. television"),
+  KE(782,"l'internet","das Internet","läng-tär-nät","engl. internet"),
+  KE(783,"la personne","die Person","pär-ßonn","engl. person"),
+  KE(784,"le parent","der Elternteil","pa-rang","engl. parent"),
+  KE(785,"le bébé","das Baby","be-be","engl. baby"),
+  KE(786,"l'animal","das Tier","la-ni-mal","engl. animal"),
+  KE(787,"le lion","der Löwe","ljong","engl. lion"),
+  KE(788,"l'éléphant","der Elefant","le-le-fang","engl. elephant"),
+  KE(789,"la girafe","die Giraffe","schi-raf","engl. giraffe"),
+  KE(790,"le zoo","der Zoo","so","engl. zoo"),
+  KE(791,"la rose","die Rose","ros","engl. rose"),
+  KE(792,"la couleur","die Farbe","ku-lör","engl. colour"),
+  KE(793,"bleu","blau","blö","engl. blue"),
+  KE(794,"la lampe","die Lampe","langp","engl. lamp"),
+  KE(795,"moderne","modern","mo-därn","engl. modern"),
+  KE(796,"simple","einfach","ßängpl","engl. simple"),
+  KE(797,"rapide","schnell","ra-pid","engl. rapid"),
+  KE(798,"normal","normal","nor-mal","engl. normal"),
+  KE(799,"spécial","besonders","ßpe-ßjal","engl. special"),
+  KE(800,"national / international","national / international","na-ßjo-nal","engl. national"),
+  KE(801,"excellent","ausgezeichnet","äk-ße-lang","engl. excellent"),
+  KE(802,"parfait","perfekt","par-fä","engl. perfect"),
+  KE(803,"intelligent","klug","äng-tä-li-schang","engl. intelligent"),
+  KE(804,"intéressant","interessant","äng-te-rä-ßang","engl. interesting"),
+  KE(805,"certain","sicher / gewiss","ßär-täng","engl. certain"),
+  KE(806,"direct","direkt","di-räkt","engl. direct"),
+  KE(807,"correct","richtig","ko-räkt","engl. correct"),
+  KE(808,"actif","aktiv","ak-tif","engl. active"),
+  KE(809,"positif / négatif","positiv / negativ","po-si-tif / ne-ga-tif","engl. positive / negative"),
+  KE(810,"la page","die Seite","pasch","engl. page"),
+  KE(811,"le village","das Dorf","wi-lasch","engl. village"),
+  KE(812,"le voyage","die Reise","wo-a-jasch","engl. voyage"),
+  KE(813,"l'âge","das Alter","lasch","engl. age"),
+  KE(814,"la chance","das Glück","schangß","engl. chance"),
+  KE(815,"la danse","der Tanz","dangß","engl. dance"),
+  KE(816,"le fruit","die Frucht","frwi","engl. fruit"),
+  KE(817,"l'orange","die Orange","lo-rangsch","engl. orange"),
+  KE(818,"la banane","die Banane","ba-nan","engl. banana"),
+  KE(819,"le chocolat","die Schokolade","scho-ko-la","engl. chocolate"),
+  KE(820,"la soupe","die Suppe","ßup","engl. soup"),
+  KE(821,"la salade","der Salat","ßa-lad","engl. salad"),
+  KE(822,"la minute","die Minute","mi-nüt","engl. minute"),
+  KE(823,"la seconde","die Sekunde","ßö-gongd","engl. second"),
+  KE(824,"le silence","die Stille","ßi-langß","engl. silence"),
+  KE(825,"la surprise","die Überraschung","ßür-pris","engl. surprise"),
+  KD(826,"le restaurant","das Restaurant","räs-to-rang","dt. Restaurant"),
+  KD(827,"l'hôtel","das Hotel","lo-täl","dt. Hotel"),
+  KD(828,"le bureau","das Büro","bü-ro","dt. Büro"),
+  KD(829,"l'étage","die Etage","le-tasch","dt. Etage"),
+  KD(830,"le garage","die Garage","ga-rasch","dt. Garage"),
+  KD(831,"le balcon","der Balkon","bal-kong","dt. Balkon"),
+  KD(832,"la terrasse","die Terrasse","tä-rass","dt. Terrasse"),
+  KD(833,"le chef","der Chef","schäf","dt. Chef"),
+  KD(834,"le niveau","das Niveau","ni-wo","dt. Niveau"),
+  KD(835,"le génie","das Genie","sche-ni","dt. Genie"),
+  KD(836,"la baguette","das Baguette","ba-gät","dt. Baguette"),
+  KD(837,"le croissant","das Croissant","kro-a-ßang","dt. Croissant"),
+  KD(838,"le champagne","der Champagner","schang-pann-jö","dt. Champagner"),
+  KD(839,"le parfum","das Parfum","par-fäng","dt. Parfum"),
+  KD(840,"la boutique","die Boutique","bu-tik","dt. Boutique"),
+  KD(841,"le menu","das Menü","mö-nü","dt. Menü"),
+  KD(842,"la saison","die Saison","ßä-song","dt. Saison"),
+  KD(843,"l'abonnement","das Abonnement","la-bon-mang","dt. Abonnement"),
+  KD(844,"l'engagement","das Engagement","lang-gasch-mang","dt. Engagement"),
+  KD(845,"le budget","das Budget","büd-schä","dt. Budget"),
+  KD(846,"la nuance","die Nuance","nü-angß","dt. Nuance"),
+  KD(847,"le milieu","das Milieu / die Mitte","mi-ljö","dt. Milieu"),
+  KD(848,"le cliché","das Klischee","kli-sche","dt. Klischee"),
+  KD(849,"le compliment","das Kompliment","kong-pli-mang","dt. Kompliment"),
+  KD(850,"le compromis","der Kompromiss","kong-pro-mi","dt. Kompromiss"),
+  KD(851,"l'adresse","die Adresse","la-dräss","dt. Adresse"),
+  KD(852,"la nature","die Natur","na-tür","dt. Natur"),
+  KD(853,"la culture","die Kultur","kül-tür","dt. Kultur"),
+  KD(854,"la littérature","die Literatur","li-te-ra-tür","dt. Literatur"),
+  KD(855,"l'auteur","der Autor","lo-tör","dt. Autor"),
+  KD(856,"la famille","die Familie","fa-mij","dt. Familie"),
+  KD(857,"l'appartement","das Appartement / die Wohnung","la-par-tö-mang","dt. Appartement"),
+  KD(858,"le canapé","das Sofa / Kanapee","ka-na-pe","dt. Kanapee"),
+  KD(859,"la toilette","die Toilette","to-a-lät","dt. Toilette"),
+  KD(860,"le trottoir","der Gehweg","tro-to-ar","dt. Trottoir"),
+  KD(861,"la façade","die Fassade","fa-ßad","dt. Fassade"),
+  KD(862,"le portrait","das Porträt","por-trä","dt. Porträt"),
+  KD(863,"le bonbon","das Bonbon","bong-bong","dt. Bonbon"),
+  KD(864,"la limonade","die Limonade","li-mo-nad","dt. Limonade"),
+  KD(865,"la mayonnaise","die Mayonnaise","ma-jo-näs","dt. Mayonnaise"),
+  KD(866,"la sauce","die Soße","ßoß","dt. Soße/Sauce"),
+  KD(867,"l'omelette","das Omelett","lom-lät","dt. Omelett"),
+  KD(868,"le filet","das Filet","fi-lä","dt. Filet"),
+  KD(869,"la crème","die Creme","kräm","dt. Creme"),
+  KD(870,"la mousse","die Mousse","muss","dt. Mousse"),
+  KD(871,"le buffet","das Büfett","bü-fä","dt. Büfett"),
+  KD(872,"la garde-robe","die Garderobe","gard-rob","dt. Garderobe"),
+  KD(873,"le costume","der Anzug / das Kostüm","kos-tüm","dt. Kostüm"),
+  KD(874,"la blouse","die Bluse / der Kittel","blus","dt. Bluse"),
+  KD(875,"le mannequin","das Mannequin / Model","man-käng","dt. Mannequin"),
+  KD(876,"la mode","die Mode","mod","dt. Mode"),
+  KD(877,"le prestige","das Prestige","präs-tisch","dt. Prestige"),
+  KD(878,"élégant","elegant","e-le-gang","dt. elegant"),
+  KD(879,"charmant","charmant","schar-mang","dt. charmant"),
+  KD(880,"le rendez-vous","der Termin / das Rendezvous","rang-de-wu","dt. Rendezvous"),
+  KD(881,"la routine","die Routine","ru-tin","dt. Routine"),
+  KD(882,"le détail","das Detail","de-taj","dt. Detail"),
+  KD(883,"le chauffeur","der Fahrer / Chauffeur","scho-för","dt. Chauffeur"),
+  KD(884,"la garantie","die Garantie","ga-rang-ti","dt. Garantie"),
+  KD(885,"le kiosque","der Kiosk","kjosk","dt. Kiosk"),
+  KD(886,"la marmelade","die Marmelade","mar-mö-lad","dt. Marmelade"),
+  KD(887,"le papier","das Papier","pa-pje","dt. Papier"),
+  KD(888,"la douche","die Dusche","dusch","dt. Dusche"),
+  KD(889,"le bal","der Ball (Tanzfest)","bal","dt. Ball"),
+  KD(890,"la médaille","die Medaille","me-daj","dt. Medaille"),
+  KD(891,"le bandage","die Bandage / der Verband","bang-dasch","dt. Bandage"),
+  KD(892,"le massage","die Massage","ma-ßasch","dt. Massage"),
+  KD(893,"la pension","die Pension","pang-ßjong","dt. Pension"),
+  KD(894,"la clinique","die Klinik","kli-nik","dt. Klinik"),
+  KD(895,"le tunnel","der Tunnel","tü-näl","dt. Tunnel"),
+  KD(896,"la fontaine","die Fontäne / der Brunnen","fong-tän","dt. Fontäne"),
+  KD(897,"le bassin","das Bassin / Becken","ba-ßäng","dt. Bassin"),
+  KD(898,"la promenade","die Promenade / der Spaziergang","pro-mö-nad","dt. Promenade"),
+  KD(899,"le souvenir","das Souvenir / die Erinnerung","ßu-wö-nir","dt. Souvenir")
+];
+
+/* =====================================================================
+   2) SM-2 ALGORITHMUS (7-Tage-komprimiert)
+===================================================================== */
+const HOUR = 3600 * 1000;
+const TOTAL_DAYS = 7;
+
+function sm2(card, quality){
+  const ef = card.efactor + (0.1 - (5 - quality) * (0.08 + (5 - quality) * 0.02));
+  card.efactor = Math.max(1.3, Math.round(ef * 100) / 100);
+  if (quality >= 3) {
+    card.repetition += 1;
+    if      (card.repetition === 1) card.interval = 4;
+    else if (card.repetition === 2) card.interval = 12;
+    else if (card.repetition === 3) card.interval = 24;
+    else card.interval = Math.round(card.interval * card.efactor);
+  } else {
+    card.repetition = 0;
+    card.interval = 10 / 60;
+  }
+  card.nextReviewDate = Date.now() + card.interval * HOUR;
+  return card;
+}
+
+/* =====================================================================
+   3) TEXT-TO-SPEECH
+===================================================================== */
+const TTS = {
+  voice: null,
+  init(){
+    if (!("speechSynthesis" in window)) return;
+    const pick = () => {
+      const voices = speechSynthesis.getVoices();
+      this.voice =
+        voices.find(v => v.lang === "fr-FR" && /Google|Amélie|Thomas|Audrey/i.test(v.name)) ||
+        voices.find(v => v.lang === "fr-FR") ||
+        voices.find(v => v.lang && v.lang.startsWith("fr")) || null;
+    };
+    pick();
+    speechSynthesis.onvoiceschanged = pick;
+  },
+  speak(text, onEnd){
+    if (!("speechSynthesis" in window)) { if (onEnd) onEnd(); return false; }
+    speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(String(text).replace(/…/g,"").replace(/·/g,","));
+    u.lang = "fr-FR";
+    if (this.voice) u.voice = this.voice;
+    u.rate = 0.85; u.pitch = 1;
+    if (onEnd) { u.onend = onEnd; u.onerror = onEnd; }
+    speechSynthesis.speak(u);
+    return true;
+  }
+};
+TTS.init();
+
+/* =====================================================================
+   4) STATE & SPEICHERUNG
+===================================================================== */
+const STORAGE_KEY = "fr7-vacation-trainer-v3";
+let memoryFallback = null;
+
+function dateKey(d){ d = d || new Date(); return d.getFullYear()+"-"+(d.getMonth()+1)+"-"+d.getDate(); }
+
+function freshState(){
+  const newToday = {}; Object.keys(DECKS).forEach(k => newToday[k] = 0);
+  return {
+    startDate: Date.now(),
+    newDate: dateKey(),
+    newToday,
+    activeDeck: "urlaub",
+    view: "learn",
+    lastExport: 0,
+    reviewsSinceExport: 0,
+    lastChange: Date.now(),  // Zeitstempel für die Cloud-Konfliktlösung
+    log: {},                 // { "2026-7-5": { urlaub:{r:12,g:9}, … } }
+    cards: SEED.map(c => ({ ...c, seen:false }))
+  };
+}
+function migrate(s){
+  if (s.lastChange === undefined) s.lastChange = Date.now();
+  if (!s.newToday) {
+    s.newToday = {}; Object.keys(DECKS).forEach(k => s.newToday[k] = 0);
+    if (typeof s.newIntroducedToday === "number") s.newToday.urlaub = s.newIntroducedToday;
+  }
+  if (!s.activeDeck || !DECKS[s.activeDeck]) s.activeDeck = "urlaub";
+  if (!s.view) s.view = "learn";
+  if (!s.log) s.log = {};
+  if (s.lastExport === undefined) s.lastExport = 0;
+  if (s.reviewsSinceExport === undefined) s.reviewsSinceExport = 0;
+  const byId = new Map(SEED.map(c => [c.id, c]));
+  const known = new Set();
+  s.cards.forEach(c => {
+    known.add(c.id);
+    const seed = byId.get(c.id);
+    if (seed) {
+      if (!c.phon) c.phon = seed.phon;
+      if (seed.cog && !c.cog) c.cog = seed.cog;
+      if (!c.deck) c.deck = seed.deck;   // Altbestand (v1/v2) = Urlaubs-Stapel
+    } else if (!c.deck) c.deck = "urlaub";
+  });
+  SEED.forEach(c => { if (!known.has(c.id)) s.cards.push({ ...c, seen:false }); });
+  return s;
+}
+function loadState(){
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) return migrate(JSON.parse(raw));
+    // Migration älterer Versionen
+    for (const oldKey of ["fr7-vacation-trainer-v2","fr7-vacation-trainer-v1"]) {
+      const old = localStorage.getItem(oldKey);
+      if (old) { const s = migrate(JSON.parse(old)); return s; }
+    }
+  } catch(e) { if (memoryFallback) return memoryFallback; }
+  return freshState();
+}
+function saveState(){
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
+  catch(e) { memoryFallback = state; }
+}
+let state = loadState();
+saveState();
+
+/* =====================================================================
+   5) WARTESCHLANGE (pro Stapel)
+===================================================================== */
+function rollover(){
+  if (state.newDate !== dateKey()) {
+    state.newDate = dateKey();
+    Object.keys(DECKS).forEach(k => state.newToday[k] = 0);
+  }
+}
+function deckCards(deck){ return state.cards.filter(c => c.deck === deck); }
+function dueReviews(deck){
+  const now = Date.now();
+  return deckCards(deck).filter(c => c.seen && c.nextReviewDate <= now)
+                        .sort((a,b) => a.nextReviewDate - b.nextReviewDate);
+}
+function newAvailable(deck){ return deckCards(deck).filter(c => !c.seen); }
+function nextCard(deck){
+  rollover();
+  const due = dueReviews(deck);
+  if (due.length) return { card: due[0], isNew:false };
+  if (state.newToday[deck] < DECKS[deck].newPerDay) {
+    const fresh = newAvailable(deck);
+    if (fresh.length) return { card: fresh[0], isNew:true };
+  }
+  return null;
+}
+
+/* =====================================================================
+   6) NAVIGATION & VIEWS
+===================================================================== */
+const stage = document.getElementById("stage");
+const controls = document.getElementById("controls");
+const navEl = document.getElementById("nav");
+let current = null;
+let flipped = false;
+
+const GRADE_LABELS = [["0","Blackout"],["1","Falsch"],["2","Fast"],["3","Schwer"],["4","Gut"],["5","Perfekt"]];
+function esc(s){ return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+
+function renderNav(){
+  rollover();
+  let html = "";
+  for (const [key,d] of Object.entries(DECKS)) {
+    const due = dueReviews(key).length;
+    const active = state.view === "learn" && state.activeDeck === key;
+    html += `<button class="nav-btn ${active?"active":""}" data-deck="${key}">
+               ${d.label}${due ? ` <span class="due-badge">${due}</span>` : ""}
+             </button>`;
+  }
+  html += `<button class="nav-btn view-btn ${state.view==="stats"?"active":""}" data-view="stats">📈 Statistik</button>`;
+  html += `<button class="nav-btn view-btn ${state.view==="guide"?"active":""}" data-view="guide">📖 Aussprache</button>`;
+  navEl.innerHTML = html;
+  navEl.querySelectorAll("[data-deck]").forEach(b => b.addEventListener("click", () => {
+    state.activeDeck = b.dataset.deck; state.view = "learn"; saveState(); renderAll();
+  }));
+  navEl.querySelectorAll("[data-view]").forEach(b => b.addEventListener("click", () => {
+    state.view = b.dataset.view; saveState(); renderAll();
+  }));
+}
+
+function renderAll(){
+  renderNav();
+  const learn = state.view === "learn";
+  document.getElementById("progressWrap").style.display = learn ? "" : "none";
+  document.getElementById("headerStats").style.display  = learn ? "" : "none";
+  controls.style.display = learn ? "" : "none";
+  if (state.view === "stats") { renderStats(); return; }
+  if (state.view === "guide") { renderGuide(); return; }
+  render();
+}
+
+/* ---------- Lern-Ansicht ---------- */
+function render(){
+  updateHeader();
+  const deck = state.activeDeck;
+  current = nextCard(deck);
+  flipped = false;
+
+  if (!current) { renderDone(deck); return; }
+  const c = current.card;
+
+  stage.innerHTML = `
+    <div class="card" id="card" role="button" aria-label="Karte umdrehen" tabindex="0">
+      <div class="face front">
+        ${current.isNew ? '<span class="new-flag">● NEU</span>' : ''}
+        <span class="cat-chip">${esc(c.category)}</span>
+        <div class="word">${esc(c.german)}</div>
+        <div class="hint">Antwort laut sagen – dann aufdecken</div>
+        <span class="lang-tag">${deck==="regeln"?"REGEL":"DE"}</span>
+      </div>
+      <div class="face back">
+        <span class="cat-chip">${esc(c.category)}</span>
+        <div class="word">${esc(c.french)}</div>
+        <div class="phon">[${esc(c.phon)}]</div>
+        ${c.cog ? `<div class="cog">🔗 fast wie: ${esc(c.cog)}</div>` : ""}
+        <button class="speak-btn" id="speakBtn" aria-label="Aussprache anhören">🔊 Anhören</button>
+        ${deck==="regeln" ? "" :
+          `<div class="phon-legend">„sch" weich wie in <i>Garage</i> · Silben mit „ng" sind nasal
+           (g nicht mitsprechen) · Betonung auf der letzten Silbe</div>`}
+        <span class="lang-tag">FR</span>
+      </div>
+    </div>`;
+
+  controls.innerHTML = `<button class="reveal-btn" id="revealBtn">Aufdecken</button>`;
+
+  const cardEl = document.getElementById("card");
+  const speakBtn = document.getElementById("speakBtn");
+  const doSpeak = () => {
+    speakBtn.classList.add("speaking");
+    const ok = TTS.speak(c.french, () => speakBtn.classList.remove("speaking"));
+    if (!ok) speakBtn.style.display = "none";
+  };
+  const flip = () => {
+    if (flipped) return;
+    flipped = true;
+    cardEl.classList.add("flipped");
+    showGrades();
+    setTimeout(doSpeak, 350);
+  };
+  cardEl.addEventListener("click", flip);
+  cardEl.addEventListener("keydown", e => { if (e.key==="Enter"||e.key===" "){ e.preventDefault(); flip(); }});
+  document.getElementById("revealBtn").addEventListener("click", flip);
+  speakBtn.addEventListener("click", e => { e.stopPropagation(); doSpeak(); });
+}
+
+function showGrades(){
+  controls.innerHTML = `
+    <div class="grade-help">0–2 = nicht gewusst (Karte kommt gleich wieder) · 3–5 = gewusst</div>
+    <div class="grades">
+      ${GRADE_LABELS.map(([n,l],q) =>
+        `<button class="grade g${q}" data-q="${q}">${n}<small>${l}</small></button>`).join("")}
+    </div>`;
+  controls.querySelectorAll(".grade").forEach(btn =>
+    btn.addEventListener("click", () => grade(parseInt(btn.dataset.q,10))));
+}
+
+function grade(q){
+  if ("speechSynthesis" in window) speechSynthesis.cancel();
+  const c = current.card;
+  const deck = c.deck;
+  if (!c.seen) { c.seen = true; state.newToday[deck] += 1; }
+  sm2(c, q);
+  // Lern-Protokoll für die Statistik
+  const k = dateKey();
+  if (!state.log[k]) state.log[k] = {};
+  if (!state.log[k][deck]) state.log[k][deck] = { r:0, g:0 };
+  state.log[k][deck].r += 1;
+  if (q >= 3) state.log[k][deck].g += 1;
+  state.reviewsSinceExport += 1;
+  state.lastChange = Date.now();
+  saveState();
+  SYNC.markDirty();
+  renderAll();
+}
+
+function renderDone(deck){
+  const cards = deckCards(deck).filter(c => c.seen).sort((a,b)=>a.nextReviewDate-b.nextReviewDate);
+  const upcoming = cards[0];
+  const freshLeft = newAvailable(deck).length;
+  let nextTxt = "Alle Karten dieses Stapels gelernt – bravo !";
+  if (upcoming) {
+    const mins = Math.max(1, Math.round((upcoming.nextReviewDate - Date.now())/60000));
+    nextTxt = mins < 60 ? `Nächste Wiederholung in ca. ${mins} Min.`
+                        : `Nächste Wiederholung in ca. ${Math.round(mins/60)} Std.`;
+  }
+  stage.innerHTML = `
+    <div class="done">
+      <h2>Session geschafft ! 🇫🇷</h2>
+      <p>Kurze Pause ist Teil des Systems: Die Abstände zwischen den
+      Wiederholungen festigen dein Gedächtnis. Du kannst auch zu einem
+      anderen Stapel wechseln – das ist echtes Interleaving.</p>
+      <div class="next-due">${nextTxt}</div>
+      ${freshLeft > 0 && state.newToday[deck] >= DECKS[deck].newPerDay
+        ? `<button class="ghost-btn" id="aheadBtn">+10 neue Karten vorziehen</button>` : ``}
+      ${state.reviewsSinceExport >= 25
+        ? `<div class="backup-warning">💾 ${state.reviewsSinceExport} Antworten seit der letzten
+           Datei-Sicherung. Jetzt unten auf „Lernstand sichern" tippen.</div>` : ``}
+    </div>`;
+  controls.innerHTML = "";
+  const ahead = document.getElementById("aheadBtn");
+  if (ahead) ahead.addEventListener("click", () => {
+    state.newToday[deck] -= 10; saveState(); renderAll();
+  });
+}
+
+function updateHeader(){
+  rollover();
+  const day = Math.min(TOTAL_DAYS, Math.floor((Date.now() - state.startDate)/(24*HOUR)) + 1);
+  document.getElementById("dayBadge").textContent = `Tag ${day} von ${TOTAL_DAYS}`;
+  const deck = state.activeDeck, d = DECKS[deck];
+  const cards = deckCards(deck);
+  const solid = cards.filter(c => c.repetition >= 2).length;
+  const ready = cards.length ? Math.round((solid/cards.length)*100) : 0;
+  const due = dueReviews(deck).length;
+  const newLeft = Math.max(0, Math.min(d.newPerDay - state.newToday[deck], newAvailable(deck).length));
+  document.getElementById("progressFill").style.width = ready + "%";
+  document.getElementById("readyLabel").textContent = `${ready} % ${d.ready}`;
+  document.getElementById("dueLabel").textContent = due > 0 ? due + " fällig" : "";
+  document.getElementById("statDue").textContent = due;
+  document.getElementById("statNew").textContent = newLeft;
+  document.getElementById("statLearned").textContent = solid;
+}
+
+/* ---------- Statistik-Ansicht ---------- */
+function lastNDays(n){
+  const out = [];
+  for (let i = n-1; i >= 0; i--) {
+    const d = new Date(); d.setDate(d.getDate()-i);
+    out.push({ key: dateKey(d), label: ["So","Mo","Di","Mi","Do","Fr","Sa"][d.getDay()] });
+  }
+  return out;
+}
+function renderStats(){
+  let html = "";
+  // Pro Stapel eine Karte
+  for (const [key,d] of Object.entries(DECKS)) {
+    const cards = deckCards(key);
+    const total = cards.length;
+    const unseen   = cards.filter(c => !c.seen).length;
+    const learning = cards.filter(c => c.seen && c.repetition < 2).length;
+    const solid    = cards.filter(c => c.repetition >= 2 && c.repetition < 4).length;
+    const mastered = cards.filter(c => c.repetition >= 4).length;
+    const ready = total ? Math.round(((solid+mastered)/total)*100) : 0;
+    // Treffsicherheit aus dem Protokoll
+    let r = 0, g = 0;
+    Object.values(state.log).forEach(day => { if (day[key]) { r += day[key].r; g += day[key].g; } });
+    const acc = r ? Math.round((g/r)*100) : null;
+    const due = dueReviews(key).length;
+    html += `
+      <div class="panel">
+        <h3><span class="deck-dot" style="background:${d.color}"></span>${d.label}
+            <span style="margin-left:auto;font-size:.78rem;color:${d.color}">${ready} % ${d.ready}</span></h3>
+        <div class="mini-bar-track"><div class="mini-bar-fill" style="width:${ready}%;background:${d.color}"></div></div>
+        <div class="stat-grid">
+          <div class="stat-cell"><b>${unseen}</b><span>Ungesehen</span></div>
+          <div class="stat-cell"><b>${learning}</b><span>Lernend</span></div>
+          <div class="stat-cell"><b>${solid}</b><span>Gefestigt</span></div>
+          <div class="stat-cell"><b>${mastered}</b><span>Gemeistert</span></div>
+        </div>
+        <div class="stat-meta">
+          <span>${r} Antworten gesamt${acc !== null ? ` · ${acc} % richtig` : ""}</span>
+          <span>${due} jetzt fällig</span>
+        </div>
+      </div>`;
+  }
+  // Aktivität der letzten 7 Tage (gestapelt nach Stapel-Farbe)
+  const days = lastNDays(7);
+  const max = Math.max(1, ...days.map(d => {
+    const day = state.log[d.key] || {};
+    return Object.values(day).reduce((s,x) => s + x.r, 0);
+  }));
+  let cols = "", labels = "";
+  for (const dInfo of days) {
+    const day = state.log[dInfo.key] || {};
+    let segs = "";
+    for (const [key,d] of Object.entries(DECKS)) {
+      const rr = day[key] ? day[key].r : 0;
+      if (rr > 0) segs = `<div class="seg" style="height:${(rr/max)*100}%;background:${d.color}"></div>` + segs;
+    }
+    cols += `<div class="col">${segs || '<div class="seg" style="height:2px;background:#ECEBE4"></div>'}</div>`;
+    labels += `<span>${dInfo.label}</span>`;
+  }
+  html += `
+    <div class="panel">
+      <h3>📅 Aktivität – letzte 7 Tage</h3>
+      <div class="chart">${cols}</div>
+      <div class="chart-labels">${labels}</div>
+      <div class="legend">
+        ${Object.values(DECKS).map(d =>
+          `<span><span class="deck-dot" style="background:${d.color}"></span>${d.label.replace(/^\S+\s/,"")}</span>`).join("")}
+      </div>
+    </div>`;
+  stage.innerHTML = `<div class="guide" style="padding-top:4px">${html}</div>`;
+}
+
+/* ---------- Aussprache-Guide ---------- */
+function renderGuide(){
+  stage.innerHTML = `<div class="guide" style="padding-top:4px">
+
+  <div class="panel">
+    <h3>🔑 Das Grundprinzip</h3>
+    <p class="intro">Französisch schreibt historisch, spricht aber ökonomisch: Es wird
+    <b>weniger gesprochen, als geschrieben steht</b>. Wer zwei Regeln verinnerlicht,
+    versteht schon die Hälfte des Rätsels:</p>
+    <p><b>1. Endkonsonanten sind meist stumm.</b> grand <span class="ph">[grang]</span>,
+    petit <span class="ph">[pö-ti]</span>, vous <span class="ph">[wu]</span>, Paris <span class="ph">[pa-ri]</span>.
+    Ausnahme-Merkwort: <b>CaReFuL</b> – c, r, f, l werden meist gesprochen
+    (avec, bonjour, neuf, hôtel).</p>
+    <p><b>2. Das End-e ist stumm</b> (table <span class="ph">[tabl]</span>), ebenso
+    <b>jedes h</b> (hôtel <span class="ph">[o-täl]</span>) und die Verb-Endung
+    <b>-ent</b> (ils parlent <span class="ph">[il parl]</span>). Die Endung
+    <b>-er</b> klingt wie e: parler <span class="ph">[par-le]</span>.</p>
+  </div>
+
+  <div class="panel">
+    <h3>🅰️ Vokal-Kombinationen</h3>
+    <p class="intro">Mehrere Buchstaben = EIN Laut. Diese acht Kombinationen decken fast alles ab:</p>
+    <table class="rule-table">
+      <tr><th>Schrift</th><th>Klang</th><th>Beispiel</th></tr>
+      <tr><td class="fr">ou</td><td>u</td><td>vous <span class="ph">[wu]</span>, bonjour</td></tr>
+      <tr><td class="fr">u</td><td>ü</td><td>tu <span class="ph">[tü]</span>, rue <span class="ph">[rü]</span></td></tr>
+      <tr><td class="fr">oi</td><td>o-a / wa</td><td>moi <span class="ph">[mo-a]</span>, trois</td></tr>
+      <tr><td class="fr">au / eau</td><td>o</td><td>beau <span class="ph">[bo]</span>, gâteau</td></tr>
+      <tr><td class="fr">eu / œu</td><td>ö</td><td>deux <span class="ph">[dö]</span>, sœur</td></tr>
+      <tr><td class="fr">ai / ei</td><td>ä / e</td><td>maison <span class="ph">[mä-song]</span></td></tr>
+      <tr><td class="fr">é</td><td>e (geschlossen)</td><td>café <span class="ph">[ka-fe]</span></td></tr>
+      <tr><td class="fr">è / ê</td><td>ä (offen)</td><td>père <span class="ph">[pär]</span>, être</td></tr>
+    </table>
+    <div class="tip">💡 Eselsbrücke: „ou" ist das deutsche u, das alleinstehende „u" ist ü.
+    Wer das einmal vertauscht hat (tu/tout), vergisst es nie wieder.</div>
+  </div>
+
+  <div class="panel">
+    <h3>👃 Die Nasale – der französische Klang schlechthin</h3>
+    <p class="intro">Vokal + n/m in derselben Silbe = Nasal: Der Vokal geht „durch die Nase",
+    das n/m wird <b>nicht</b> als Konsonant gesprochen. In der Lautschrift dieser App: „ng".</p>
+    <table class="rule-table">
+      <tr><th>Schrift</th><th>Klang</th><th>Beispiel</th></tr>
+      <tr><td class="fr">on / om</td><td>ong</td><td>bon <span class="ph">[bong]</span>, nom</td></tr>
+      <tr><td class="fr">an / en / am / em</td><td>ang</td><td>France <span class="ph">[frangß]</span>, temps</td></tr>
+      <tr><td class="fr">in / ain / ein</td><td>äng</td><td>vin <span class="ph">[wäng]</span>, pain</td></tr>
+      <tr><td class="fr">un</td><td>äng/öng</td><td>un <span class="ph">[äng]</span>, lundi</td></tr>
+      <tr><td class="fr">oin</td><td>o-äng</td><td>loin <span class="ph">[lo-äng]</span></td></tr>
+    </table>
+    <div class="tip">⚠️ Entscheidende Gegen-Regel: Folgt ein Vokal oder ein doppeltes n/m,
+    ist es <b>kein</b> Nasal mehr: bon <span class="ph">[bong]</span> → bonne <span class="ph">[bonn]</span>,
+    an <span class="ph">[ang]</span> → année <span class="ph">[a-ne]</span>.</div>
+  </div>
+
+  <div class="panel">
+    <h3>🔤 Konsonanten-Spezialitäten</h3>
+    <table class="rule-table">
+      <tr><th>Schrift</th><th>Klang</th><th>Beispiel</th></tr>
+      <tr><td class="fr">ch</td><td>hartes sch</td><td>chambre <span class="ph">[schangbr]</span></td></tr>
+      <tr><td class="fr">j</td><td>weiches sch (Garage)</td><td>je <span class="ph">[schö]</span>, bonjour</td></tr>
+      <tr><td class="fr">g + e/i</td><td>weiches sch</td><td>plage <span class="ph">[plasch]</span> (sonst hart: gare)</td></tr>
+      <tr><td class="fr">c + e/i</td><td>ß</td><td>merci <span class="ph">[mär-ßi]</span> (sonst k: café)</td></tr>
+      <tr><td class="fr">ç</td><td>immer ß</td><td>ça <span class="ph">[ßa]</span>, français</td></tr>
+      <tr><td class="fr">qu</td><td>k</td><td>qui <span class="ph">[ki]</span>, quatre</td></tr>
+      <tr><td class="fr">gn</td><td>nj</td><td>champagne <span class="ph">[schang-pann-jö]</span></td></tr>
+      <tr><td class="fr">ill / il</td><td>j</td><td>famille <span class="ph">[fa-mij]</span>, travail (Ausnahmen: ville, mille = l)</td></tr>
+      <tr><td class="fr">s zw. Vokalen</td><td>weiches s</td><td>poison <span class="ph">[po-a-song]</span> vs. poisson <span class="ph">[po-a-ßong]</span></td></tr>
+      <tr><td class="fr">-tion</td><td>ßjong</td><td>attention <span class="ph">[a-tang-ßjong]</span></td></tr>
+      <tr><td class="fr">r</td><td>Rachen-r</td><td>wie dt. „rot", nie gerollt</td></tr>
+    </table>
+  </div>
+
+  <div class="panel">
+    <h3>🔗 Die Liaison (Bindung)</h3>
+    <p>Der Grund, warum gesprochenes Französisch wie ein einziger Wortfluss klingt:
+    Ein eigentlich <b>stummer Endkonsonant wird gesprochen, wenn das nächste Wort mit
+    Vokal beginnt</b> – und zwar am Anfang des nächsten Wortes:</p>
+    <p>vous avez → <span class="ph">[wu-sa-we]</span> · les amis → <span class="ph">[le-sa-mi]</span> ·
+    un homme → <span class="ph">[äng-nom]</span> · petit ami → <span class="ph">[pö-ti-ta-mi]</span></p>
+    <div class="tip">💡 Fürs Hörverstehen ist das die wichtigste Regel überhaupt: „wu-sa-we"
+    ist kein neues Wort, sondern „vous avez". Wer Liaisons erwartet, versteht plötzlich doppelt so viel.</div>
+  </div>
+
+  <div class="panel">
+    <h3>🎯 Betonung & Rhythmus</h3>
+    <p>Anders als im Deutschen (BAHN-hof) liegt die Betonung im Französischen <b>immer auf
+    der letzten Silbe</b> der Wortgruppe: restaurant <span class="ph">[räs-to-RANG]</span>,
+    université <span class="ph">[ü-ni-wär-ßi-TE]</span>. Alle Silben davor werden gleichmäßig
+    und ohne Druck gesprochen – das erzeugt den typischen „fließenden" Klang.</p>
+    <button class="ghost-btn" id="toRules" style="margin-top:14px;width:100%">
+      🔤 Diese Regeln jetzt als Karten üben
+    </button>
+  </div>
+
+  </div>`;
+  const btn = document.getElementById("toRules");
+  if (btn) btn.addEventListener("click", () => {
+    state.activeDeck = "regeln"; state.view = "learn"; saveState(); renderAll();
+  });
+}
+
+/* =====================================================================
+   7) CLOUD-SYNC — gleicher Lernstand auf allen Geräten
+   Ablage als JSON-Dokument bei jsonblob.com (kostenlos, ohne Konto).
+   - "Aktivieren" legt ein Cloud-Dokument an → dessen ID ist der SYNC-CODE
+   - Den Code auf einem zweiten Gerät eingeben → beide Geräte teilen
+     denselben Stand
+   - Automatik: Pull beim Start, Push gebündelt nach Antworten und beim
+     Verlassen der App
+   - Konfliktlösung: der Stand mit dem NEUEREN lastChange gewinnt
+   Hinweis: Der Sync-Code wirkt wie ein Passwort — wer ihn kennt, kann
+   den Lernstand lesen. Es werden nur Vokabel-Lerndaten übertragen.
+===================================================================== */
+const SYNC = {
+  API: "https://jsonblob.com/api/jsonBlob",
+  KEY: "fr7-sync-v1",
+  cfg: { id: null, lastSync: 0 },
+  dirty: false,
+  busy: false,
+  lastError: null,
+
+  init(){
+    try { const raw = localStorage.getItem(this.KEY); if (raw) this.cfg = JSON.parse(raw); } catch(e) {}
+    if (this.cfg.collapsed === undefined) this.cfg.collapsed = true;   // standardmäßig eingeklappt
+    const toggle = document.getElementById("syncToggle");
+    toggle.addEventListener("click", () => {
+      this.cfg.collapsed = !this.cfg.collapsed;
+      this.save(); this.applyCollapsed();
+    });
+    this.applyCollapsed();
+    this.renderBox();
+    if (this.cfg.id) this.pull();                       // beim Start: Cloud-Stand holen
+    setInterval(() => this.flush(), 30000);             // gebündelter Auto-Push
+    document.addEventListener("visibilitychange", () => {
+      if (document.visibilityState === "hidden") this.flush(true);
+    });
+  },
+  applyCollapsed(){
+    document.getElementById("syncBody").style.display = this.cfg.collapsed ? "none" : "";
+    document.getElementById("syncChev").classList.toggle("open", !this.cfg.collapsed);
+    document.getElementById("syncToggle").setAttribute("aria-expanded", String(!this.cfg.collapsed));
+  },
+  save(){ try { localStorage.setItem(this.KEY, JSON.stringify(this.cfg)); } catch(e) {} },
+  markDirty(){ this.dirty = true; },
+
+  payload(){
+    return JSON.stringify({ app:"fr7-vacation-trainer", version:3, updatedAt:Date.now(), state });
+  },
+
+  async enable(){
+    if (this.busy) return;
+    // Häufigste Ursache: App als lokale Datei geöffnet → Browser blockiert Cloud-Zugriffe
+    if (location.protocol === "file:") {
+      this.lastError = "Die App läuft als lokale Datei (file://) – viele Browser blockieren " +
+        "dann Cloud-Zugriffe. Lösung: App über eine https-Adresse öffnen (z. B. GitHub Pages) " +
+        "oder den Sync-Code manuell anlegen (siehe Hinweis unten).";
+      this.renderBox(); return;
+    }
+    this.busy = true; this.lastError = null; this.renderBox("Cloud-Dokument wird angelegt…");
+    try {
+      const res = await fetch(this.API, {
+        method:"POST", headers:{ "Content-Type":"application/json", "Accept":"application/json" },
+        body: this.payload()
+      });
+      if (!res.ok) throw new Error("Server antwortet mit HTTP " + res.status + " " + (res.statusText||""));
+      const loc = res.headers.get("Location") || res.headers.get("X-jsonblob") || "";
+      const id = loc.split("/").pop();
+      if (!id) throw new Error("NO_ID");
+      this.cfg.id = id; this.cfg.lastSync = Date.now();
+      this.save(); this.dirty = false;
+    } catch(e) {
+      if (e && e.message === "NO_ID") {
+        this.lastError = "Das Cloud-Dokument wurde zwar angelegt, aber der Browser durfte die " +
+          "Dokument-ID nicht lesen (CORS). Nutze bitte den manuellen Weg unten.";
+      } else if (e instanceof TypeError) {
+        this.lastError = "Netzwerkfehler: " + (e.message || "Verbindung fehlgeschlagen") +
+          " – offline, Werbeblocker/Content-Blocker aktiv, oder jsonblob.com nicht erreichbar.";
+      } else {
+        this.lastError = "Aktivierung fehlgeschlagen: " + (e && e.message ? e.message : "unbekannter Fehler");
+      }
+    }
+    this.busy = false; this.renderBox();
+  },
+
+  async linkExisting(){
+    const code = prompt("Sync-Code vom anderen Gerät eingeben:");
+    if (!code) return;
+    const id = code.trim().split("/").pop();
+    this.busy = true; this.lastError = null; this.renderBox("Verbinde…");
+    try {
+      const res = await fetch(this.API + "/" + encodeURIComponent(id), { headers:{ "Accept":"application/json" } });
+      if (res.status === 404) throw new Error("Unter diesem Code existiert kein Cloud-Dokument (Tippfehler?).");
+      if (!res.ok) throw new Error("Server antwortet mit HTTP " + res.status);
+      const remote = await res.json();
+      this.cfg.id = id; this.cfg.lastSync = Date.now(); this.save();
+      if (remote && remote.state && Array.isArray(remote.state.cards)) {
+        this.adoptIfNewer(remote);          // echter Lernstand → normaler Abgleich
+      } else {
+        this.dirty = true; await this.flush(); // frisch/manuell angelegter Blob → lokalen Stand hochladen
+      }
+    } catch(e) {
+      this.lastError = (e instanceof TypeError)
+        ? "Netzwerkfehler – offline, Content-Blocker aktiv oder Dienst nicht erreichbar."
+        : (e && e.message ? e.message : "Code ungültig oder Dienst nicht erreichbar.");
+    }
+    this.busy = false; this.renderBox();
+  },
+
+  adoptIfNewer(remote){
+    const remoteChange = (remote.state && remote.state.lastChange) || remote.updatedAt || 0;
+    if (remoteChange > (state.lastChange || 0)) {
+      state = migrate(remote.state);
+      saveState(); renderAll(); updateBackupStatus();
+    } else if ((state.lastChange || 0) > remoteChange) {
+      this.dirty = true; this.flush();                  // lokal ist neuer → hochladen
+    }
+  },
+
+  async pull(){
+    if (!this.cfg.id || this.busy) return;
+    this.busy = true; this.renderBox("Synchronisiere…");
+    try {
+      const res = await fetch(this.API + "/" + this.cfg.id, { headers:{ "Accept":"application/json" } });
+      if (!res.ok) throw new Error("HTTP " + res.status);
+      const remote = await res.json();
+      this.adoptIfNewer(remote);
+      this.cfg.lastSync = Date.now(); this.save(); this.lastError = null;
+    } catch(e) {
+      this.lastError = "Cloud nicht erreichbar – es gilt der lokale Stand.";
+    }
+    this.busy = false; this.renderBox();
+  },
+
+  async flush(useKeepalive){
+    if (!this.cfg.id || !this.dirty || this.busy) return;
+    this.busy = true;
+    try {
+      const res = await fetch(this.API + "/" + this.cfg.id, {
+        method:"PUT", headers:{ "Content-Type":"application/json", "Accept":"application/json" },
+        body: this.payload(),
+        keepalive: !!useKeepalive
+      });
+      if (!res.ok) throw new Error("HTTP " + res.status);
+      this.dirty = false; this.cfg.lastSync = Date.now(); this.save(); this.lastError = null;
+    } catch(e) {
+      this.lastError = "Upload fehlgeschlagen – wird automatisch erneut versucht.";
+    }
+    this.busy = false; this.renderBox();
+  },
+
+  unlink(){
+    if (!confirm("Cloud-Sync auf DIESEM Gerät trennen? (Das Cloud-Dokument und andere Geräte bleiben unberührt.)")) return;
+    this.cfg = { id:null, lastSync:0, collapsed:this.cfg.collapsed }; this.save(); this.renderBox();
+  },
+
+  renderBox(statusOverride){
+    const body = document.getElementById("syncBody");
+    const dot = document.getElementById("syncDot");
+    const summary = document.getElementById("syncSummary");
+    if (!body) return;
+
+    // Kopfzeile (immer sichtbar, auch eingeklappt)
+    dot.className = "sync-dot " + (this.lastError ? "err" : this.cfg.id ? "on" : "");
+    summary.textContent = this.lastError ? "Fehler" :
+                          this.cfg.id ? "aktiv" : "aus";
+
+    if (!this.cfg.id) {
+      body.innerHTML = `
+        <div class="backup-row">
+          <button class="backup-btn" id="syncEnableBtn">☁️ Auf diesem Gerät aktivieren</button>
+        </div>
+        <div style="text-align:center;margin-top:4px">
+          <button class="link-btn" id="syncLinkBtn">Ich habe schon einen Sync-Code</button>
+        </div>
+        <div class="sync-status-line ${this.lastError?"err":""}">${statusOverride || this.lastError ||
+          "Gleicher Lernstand auf iPhone, PC & Co. – ohne Konto."}</div>
+        ${this.lastError ? `
+        <div class="sync-status-line" style="margin-top:8px;text-align:left">
+          <b>Manueller Weg (funktioniert immer):</b> 1. Öffne <b>jsonblob.com</b> im Browser ·
+          2. Tippe dort auf „Save" · 3. Kopiere die lange Zahl aus der Adresszeile
+          (jsonblob.com/<b>123456…</b>) · 4. Füge sie hier über
+          „Ich habe schon einen Sync-Code" ein. Hinweis: Das klappt erst, wenn der Blob
+          gültiges JSON enthält – der vorausgefüllte Beispiel-Inhalt reicht; deine App
+          überschreibt ihn beim ersten Sync automatisch.</div>` : ``}`;
+      document.getElementById("syncEnableBtn").addEventListener("click", () => this.enable());
+      document.getElementById("syncLinkBtn").addEventListener("click", () => this.linkExisting());
+    } else {
+      const mins = this.cfg.lastSync ? Math.round((Date.now()-this.cfg.lastSync)/60000) : null;
+      const when = mins === null ? "–" : mins < 1 ? "gerade eben" :
+                   mins < 60 ? `vor ${mins} Min.` : `vor ${Math.round(mins/60)} Std.`;
+      summary.textContent = this.lastError ? "Fehler" : `synchron · ${when}`;
+      body.innerHTML = `
+        <span class="sync-code" id="syncCodeEl" title="Tippen zum Kopieren">${esc(this.cfg.id)}</span>
+        <div class="backup-row">
+          <button class="backup-btn" id="syncNowBtn">🔄 Jetzt synchronisieren</button>
+          <button class="backup-btn" id="syncUnlinkBtn">✂️ Trennen</button>
+        </div>
+        <div class="sync-status-line ${this.lastError?"err":""}">${statusOverride || this.lastError ||
+          `Zuletzt synchronisiert: ${when} · Diesen Code am anderen Gerät unter
+           „Ich habe schon einen Sync-Code" eingeben.`}</div>`;
+      document.getElementById("syncNowBtn").addEventListener("click", async () => { await this.flush(); await this.pull(); });
+      document.getElementById("syncUnlinkBtn").addEventListener("click", () => this.unlink());
+      document.getElementById("syncCodeEl").addEventListener("click", () => {
+        const codeEl = document.getElementById("syncCodeEl");
+        const done = () => { codeEl.textContent = "✔ Kopiert!"; setTimeout(() => this.renderBox(), 1200); };
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(this.cfg.id).then(done, done);
+        } else done();
+      });
+    }
+  }
+};
+
+/* =====================================================================
+   8) DATEI-SICHERUNG
+===================================================================== */
+const exportBtn = document.getElementById("exportBtn");
+const importBtn = document.getElementById("importBtn");
+const importFile = document.getElementById("importFile");
+const backupStatus = document.getElementById("backupStatus");
+
+function backupFilename(){
+  const d = new Date(); const p = n => String(n).padStart(2,"0");
+  return `franzoesisch-lernstand-${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())}.json`;
+}
+async function exportState(){
+  const payload = JSON.stringify({ app:"fr7-vacation-trainer", version:3, exportedAt:Date.now(), state }, null, 2);
+  const file = new File([payload], backupFilename(), { type:"application/json" });
+  let saved = false;
+  if (navigator.canShare && navigator.canShare({ files:[file] })) {
+    try { await navigator.share({ files:[file], title:"Französisch-Lernstand" }); saved = true; }
+    catch(e) {}
+  }
+  if (!saved) {
+    const url = URL.createObjectURL(new Blob([payload], { type:"application/json" }));
+    const a = document.createElement("a");
+    a.href = url; a.download = backupFilename();
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 2000);
+    saved = true;
+  }
+  if (saved) {
+    state.lastExport = Date.now(); state.reviewsSinceExport = 0;
+    saveState(); updateBackupStatus();
+  }
+}
+function importState(file){
+  const reader = new FileReader();
+  reader.onload = () => {
+    try {
+      const data = JSON.parse(reader.result);
+      const s = data.state || data;
+      if (!s || !Array.isArray(s.cards) || !s.cards.every(c => typeof c.id === "number" && "efactor" in c)) {
+        alert("Diese Datei ist keine gültige Lernstand-Sicherung."); return;
+      }
+      if (!confirm("Gespeicherten Lernstand laden? Der aktuelle Fortschritt auf diesem Gerät wird ersetzt.")) return;
+      state = migrate(s);
+      state.lastChange = Date.now();
+      saveState(); SYNC.markDirty(); SYNC.flush();
+      renderAll(); updateBackupStatus();
+      alert("Lernstand erfolgreich wiederhergestellt ✔");
+    } catch(e) { alert("Die Datei konnte nicht gelesen werden."); }
+  };
+  reader.readAsText(file);
+}
+function updateBackupStatus(){
+  const stale = state.reviewsSinceExport >= 25 ||
+    (state.lastExport > 0 && Date.now() - state.lastExport > 24*HOUR && state.reviewsSinceExport > 0);
+  if (!state.lastExport) {
+    backupStatus.textContent = "Fortschritt wird automatisch im Browser gespeichert. Tipp: Zusätzlich als Datei sichern.";
+    backupStatus.className = "backup-status" + (state.reviewsSinceExport >= 25 ? " warn" : "");
+  } else {
+    const mins = Math.round((Date.now() - state.lastExport)/60000);
+    const when = mins < 60 ? `vor ${Math.max(1,mins)} Min.` :
+                 mins < 1440 ? `vor ${Math.round(mins/60)} Std.` : `vor ${Math.round(mins/1440)} Tag(en)`;
+    backupStatus.textContent = `Automatisch gespeichert · Letzte Datei-Sicherung: ${when}` +
+      (stale ? " – Zeit für eine neue Sicherung!" : "");
+    backupStatus.className = "backup-status" + (stale ? " warn" : "");
+  }
+}
+exportBtn.addEventListener("click", exportState);
+importBtn.addEventListener("click", () => importFile.click());
+importFile.addEventListener("change", () => {
+  if (importFile.files && importFile.files[0]) importState(importFile.files[0]);
+  importFile.value = "";
+});
+
+document.getElementById("resetBtn").addEventListener("click", () => {
+  if (confirm("Wirklich den GESAMTEN Lernfortschritt aller Stapel löschen?")) {
+    state = freshState(); saveState();
+    SYNC.markDirty(); SYNC.flush();
+    renderAll(); updateBackupStatus();
+  }
+});
+
+setInterval(() => {
+  if (state.view === "learn" && !current) renderAll();
+  else if (state.view === "learn") { updateHeader(); renderNav(); }
+  updateBackupStatus();
+}, 30000);
+
+renderAll();
+updateBackupStatus();
+SYNC.init();
+</script>
+</body>
+</html>
