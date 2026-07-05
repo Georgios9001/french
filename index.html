@@ -252,6 +252,8 @@ const DECKS = {
   alltag:   { label:"💬 Alltag",   ready:"Alltags-Ready",  color:"#D3323A", newPerDay:20 },
   top:      { label:"⭐ Top 200",  ready:"Basis-Ready",    color:"#B07A1F", newPerDay:35 },
   kognaten: { label:"🔗 Kognaten", ready:"Transfer-Ready", color:"#6B4FA1", newPerDay:40 },
+  schimpf:  { label:"🤬 Schimpfen",ready:"Schimpf-Ready",  color:"#C2410C", newPerDay:15 },
+  flirt:    { label:"💘 Flirt",    ready:"Charme-Ready",   color:"#C2418F", newPerDay:15 },
   regeln:   { label:"🔤 Regeln",   ready:"Regel-Ready",    color:"#1F7A4D", newPerDay:12 }
 };
 
@@ -272,6 +274,8 @@ const R  = (id,f,g,p)   => v(id,f,g,p,"Aussprache-Regel","regeln");
 const KG = (id,f,g,p,cog) => ({ ...v(id,f,g,p,"Griechisch-Brücke","kognaten"), cog });
 const KE = (id,f,g,p,cog) => ({ ...v(id,f,g,p,"Englisch-Brücke","kognaten"),   cog });
 const KD = (id,f,g,p,cog) => ({ ...v(id,f,g,p,"Deutsch-Brücke","kognaten"),    cog });
+const SW = (id,f,g,p,c) => v(id,f,g,p,c,"schimpf");
+const FL = (id,f,g,p,c) => v(id,f,g,p,c,"flirt");
 
 const SEED = [
   /* ================= STAPEL 1: URLAUB (id 1–180) ================= */
@@ -991,7 +995,117 @@ const SEED = [
   KD(896,"la fontaine","die Fontäne / der Brunnen","fong-tän","dt. Fontäne"),
   KD(897,"le bassin","das Bassin / Becken","ba-ßäng","dt. Bassin"),
   KD(898,"la promenade","die Promenade / der Spaziergang","pro-mö-nad","dt. Promenade"),
-  KD(899,"le souvenir","das Souvenir / die Erinnerung","ßu-wö-nir","dt. Souvenir")
+  KD(899,"le souvenir","das Souvenir / die Erinnerung","ßu-wö-nir","dt. Souvenir"),
+
+  /* ================= STAPEL 6: SCHIMPFEN (id 900–949) =================
+     Kategorien = Stärkegrad, damit du weißt, was du sagst:
+     Harmlos < Derb < Sehr derb. Vieles davon nur verstehen, nicht
+     unbedingt selbst benutzen!                                        */
+  SW(900,"Zut !","Mist!","ßüt","Harmlos"),
+  SW(901,"Mince !","Verflixt!","mängß","Harmlos"),
+  SW(902,"La vache !","Krass! / Wahnsinn!","la wasch","Harmlos"),
+  SW(903,"Oh là là","oh je / na sowas","o la la","Harmlos"),
+  SW(904,"Merde !","Scheiße!","märd","Derb"),
+  SW(905,"Et merde…","Ach Scheiße… (resigniert)","e märd","Derb"),
+  SW(906,"Putain !","Verdammt! / Scheiße! (extrem häufig)","pü-täng","Derb"),
+  SW(907,"Putain de merde !","Verdammte Scheiße!","pü-täng dö märd","Sehr derb"),
+  SW(908,"Bordel !","So ein Mist! / Chaos!","bor-däl","Derb"),
+  SW(909,"Quel bordel !","Was für ein Chaos / Saustall!","käl bor-däl","Derb"),
+  SW(910,"le bordel","das Chaos / Durcheinander","lö bor-däl","Derb"),
+  SW(911,"C'est de la merde","Das ist Schrott","ßä dö la märd","Derb"),
+  SW(912,"C'est chiant","Das ist ätzend / nervt","ßä schjang","Derb"),
+  SW(913,"Ça me fait chier","Das kotzt mich an","ßa mö fä schje","Sehr derb"),
+  SW(914,"C'est nul","Das ist mies","ßä nül","Harmlos"),
+  SW(915,"pourri","beschissen / vergammelt","pu-ri","Derb"),
+  SW(916,"dégueulasse","eklig / widerlich","de-gö-lass","Derb"),
+  SW(917,"C'est dégueulasse !","Das ist widerlich!","ßä de-gö-lass","Derb"),
+  SW(918,"con / conne","blöd / Idiot(in) (sehr häufig)","kong / konn","Derb"),
+  SW(919,"C'est con","Das ist blöd / dumm gelaufen","ßä kong","Derb"),
+  SW(920,"Quel con !","So ein Idiot!","käl kong","Derb"),
+  SW(921,"Sale con !","Blödes Arschloch!","ßal kong","Sehr derb"),
+  SW(922,"connard / connasse","Arschloch (m) / blöde Kuh (w)","ko-nar / ko-nass","Sehr derb"),
+  SW(923,"salaud / salope","Mistkerl / Miststück","ßa-lo / ßa-lop","Sehr derb"),
+  SW(924,"enfoiré","Dreckskerl","ang-fo-a-re","Sehr derb"),
+  SW(925,"crétin","Trottel","kre-täng","Derb"),
+  SW(926,"imbécile","Dummkopf","äng-be-ßil","Derb"),
+  SW(927,"idiot / idiote","Idiot / Idiotin","i-djo / i-djot","Derb"),
+  SW(928,"Espèce d'idiot !","Du Vollidiot!","äs-päss di-djo","Derb"),
+  SW(929,"abruti","Vollpfosten","a-brü-ti","Derb"),
+  SW(930,"débile","bescheuert / schwachsinnig","de-bil","Derb"),
+  SW(931,"les conneries","der Blödsinn / Mist","le kon-ri","Derb"),
+  SW(932,"Arrête tes conneries !","Hör auf mit dem Blödsinn!","a-rät te kon-ri","Derb"),
+  SW(933,"Ferme-la !","Halt den Mund!","färm la","Derb"),
+  SW(934,"Ta gueule !","Halt's Maul!","ta göl","Sehr derb"),
+  SW(935,"Dégage !","Verzieh dich!","de-gasch","Derb"),
+  SW(936,"Casse-toi !","Verpiss dich!","kass to-a","Sehr derb"),
+  SW(937,"Fous le camp !","Hau ab!","fu lö kang","Sehr derb"),
+  SW(938,"Va te faire voir !","Zieh Leine! / Rutsch mir den Buckel runter!","wa tö fär wo-ar","Derb"),
+  SW(939,"Va te faire foutre !","Fick dich! (härteste Stufe)","wa tö fär futr","Sehr derb"),
+  SW(940,"Lâche-moi !","Lass mich in Ruhe!","lasch mo-a","Derb"),
+  SW(941,"Mêle-toi de tes affaires !","Kümmer dich um deinen eigenen Kram!","mäl to-a dö te-sa-fär","Derb"),
+  SW(942,"T'es fou ? / T'es folle ?","Spinnst du?","tä fu / tä fol","Harmlos"),
+  SW(943,"Ça va pas la tête ?!","Geht's noch?!","ßa wa pa la tät","Derb"),
+  SW(944,"Tu te fous de moi ?","Verarschst du mich?","tü tö fu dö mo-a","Derb"),
+  SW(945,"C'est une blague ?","Soll das ein Witz sein?","ßä-tün blag","Harmlos"),
+  SW(946,"Je m'en fiche","Ist mir egal (mild)","schö mang fisch","Harmlos"),
+  SW(947,"Je m'en fous","Ist mir egal (derb)","schö mang fu","Derb"),
+  SW(948,"J'en ai rien à foutre","Ist mir scheißegal","schang-ne ri-äng a futr","Sehr derb"),
+  SW(949,"Va te faire cuire un œuf !","Geh dahin, wo der Pfeffer wächst! (wörtl.: Koch dir ein Ei)","wa tö fär kwir äng-nöf","Harmlos"),
+
+  /* ================= STAPEL 7: FLIRT & ROMANTIK (id 950–999) =================
+     Vom ersten Ansprechen über Komplimente und Kosenamen bis zu
+     leidenschaftlichen Momenten. Flirten läuft im Französischen
+     grundsätzlich per „tu".                                           */
+  FL(950,"Tu viens souvent ici ?","Kommst du öfter her? (der Klassiker)","tü wjäng ßu-wang i-ßi","Ansprechen"),
+  FL(951,"Je peux t'offrir un verre ?","Darf ich dir einen Drink ausgeben?","schö pö to-frir äng wär","Ansprechen"),
+  FL(952,"Tu es d'ici ?","Bist du von hier?","tü ä di-ßi","Ansprechen"),
+  FL(953,"On se connaît ?","Kennen wir uns nicht?","ong ßö ko-nä","Ansprechen"),
+  FL(954,"Je peux m'asseoir à côté de toi ?","Darf ich mich zu dir setzen?","schö pö ma-ßo-ar a ko-te dö to-a","Ansprechen"),
+  FL(955,"Tu as de très beaux yeux","Du hast wunderschöne Augen","tü a dö trä bo-sjö","Kompliment"),
+  FL(956,"J'adore ton sourire","Ich liebe dein Lächeln","scha-dor tong ßu-rir","Kompliment"),
+  FL(957,"Tu es très belle / très beau","Du bist sehr schön / sehr gutaussehend","tü ä trä bäl / trä bo","Kompliment"),
+  FL(958,"Tu es charmante / charmant","Du bist bezaubernd","tü ä schar-mangt / schar-mang","Kompliment"),
+  FL(959,"Tu me plais","Du gefällst mir","tü mö plä","Kompliment"),
+  FL(960,"Je te trouve très séduisante / séduisant","Ich finde dich sehr verführerisch","schö tö truw trä ße-dwi-sangt","Kompliment"),
+  FL(961,"Tu as un charme fou","Du hast einen unglaublichen Charme","tü a äng scharm fu","Kompliment"),
+  FL(962,"J'aime ton parfum","Ich liebe deinen Duft","schäm tong par-fäng","Kompliment"),
+  FL(963,"Tu es irrésistible","Du bist unwiderstehlich","tü ä i-re-sis-tibl","Kompliment"),
+  FL(964,"J'ai pensé à toi toute la journée","Ich habe den ganzen Tag an dich gedacht","sche pang-ße a to-a tut la schur-ne","Romantik"),
+  FL(965,"Tu me manques déjà","Du fehlst mir jetzt schon","tü mö mangk de-scha","Romantik"),
+  FL(966,"J'ai des papillons dans le ventre","Ich habe Schmetterlinge im Bauch","sche de pa-pi-jong dang lö wangtr","Romantik"),
+  FL(967,"Je suis fou / folle de toi","Ich bin verrückt nach dir","schö ßwi fu / fol dö to-a","Romantik"),
+  FL(968,"Je ne pense qu'à toi","Ich denke nur an dich","schö nö pangß ka to-a","Romantik"),
+  FL(969,"Tu es l'homme / la femme de ma vie","Du bist der Mann / die Frau meines Lebens","tü ä lom / la fam dö ma wi","Romantik"),
+  FL(970,"Je t'aime plus que tout","Ich liebe dich über alles","schö täm plü kö tu","Romantik"),
+  FL(971,"mon cœur","mein Herz (Kosename)","mong kör","Kosenamen"),
+  FL(972,"mon amour","mein Schatz / meine Liebe","mo-na-mur","Kosenamen"),
+  FL(973,"ma chérie / mon chéri","Liebling (w / m)","ma sche-ri / mong sche-ri","Kosenamen"),
+  FL(974,"mon trésor","mein Schatz (wörtl. Schatz)","mong tre-sor","Kosenamen"),
+  FL(975,"ma puce","mein Mäuschen (wörtl.: mein Floh!)","ma püss","Kosenamen"),
+  FL(976,"mon lapin","mein Häschen","mong la-päng","Kosenamen"),
+  FL(977,"ma belle / mon beau","meine Schöne / mein Schöner","ma bäl / mong bo","Kosenamen"),
+  FL(978,"On prend un dernier verre chez moi ?","Noch einen Absacker bei mir?","ong prang äng där-nje wär sche mo-a","Verführung"),
+  FL(979,"Je peux t'embrasser ?","Darf ich dich küssen?","schö pö tang-bra-ße","Verführung"),
+  FL(980,"Embrasse-moi","Küss mich","ang-braß mo-a","Verführung"),
+  FL(981,"Viens plus près","Komm näher","wjäng plü prä","Verführung"),
+  FL(982,"Tu me rends fou / folle","Du machst mich verrückt","tü mö rang fu / fol","Verführung"),
+  FL(983,"Tu me fais de l'effet","Du hast eine Wirkung auf mich…","tü mö fä dö le-fä","Verführung"),
+  FL(984,"J'adore quand tu me regardes comme ça","Ich liebe es, wenn du mich so ansiehst","scha-dor kang tü mö rö-gard kom ßa","Verführung"),
+  FL(985,"J'ai envie de toi","Ich begehre dich","sche ang-wi dö to-a","Leidenschaft"),
+  FL(986,"Reste avec moi cette nuit","Bleib heute Nacht bei mir","räst a-wäk mo-a ßät nwi","Leidenschaft"),
+  FL(987,"Je veux te sentir contre moi","Ich will dich an mir spüren","schö wö tö ßang-tir kongtr mo-a","Leidenschaft"),
+  FL(988,"Ta peau est si douce","Deine Haut ist so weich","ta po ä ßi duß","Leidenschaft"),
+  FL(989,"Serre-moi fort","Halt mich ganz fest","ßär mo-a for","Leidenschaft"),
+  FL(990,"Tu embrasses divinement bien","Du küsst himmlisch","tü ang-braß di-win-mang bjäng","Leidenschaft"),
+  FL(991,"Fais-moi l'amour","Liebe mich / Schlaf mit mir","fä mo-a la-mur","Leidenschaft"),
+  FL(992,"Doucement…","Ganz sachte…","duß-mang","Leidenschaft"),
+  FL(993,"Tu es à moi ce soir","Heute Abend gehörst du mir","tü ä a mo-a ßö ßo-ar","Leidenschaft"),
+  FL(994,"C'était magique","Das war magisch","ße-tä ma-schik","Danach"),
+  FL(995,"J'ai adoré cette nuit avec toi","Ich fand diese Nacht mit dir wunderbar","sche a-do-re ßät nwi a-wäk to-a","Danach"),
+  FL(996,"Tu veux rester dormir ?","Willst du zum Schlafen hierbleiben?","tü wö räs-te dor-mir","Danach"),
+  FL(997,"Je te prépare un petit-déjeuner ?","Mach ich dir Frühstück?","schö tö pre-par äng pö-ti-de-schö-ne","Danach"),
+  FL(998,"On se revoit quand ?","Wann sehen wir uns wieder?","ong ßö rö-wo-a kang","Danach"),
+  FL(999,"J'ai hâte de te revoir","Ich kann es kaum erwarten, dich wiederzusehen","sche at dö tö rö-wo-ar","Danach")
 ];
 
 /* =====================================================================
