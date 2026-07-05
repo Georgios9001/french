@@ -254,6 +254,7 @@ const DECKS = {
   kognaten: { label:"🔗 Kognaten", ready:"Transfer-Ready", color:"#6B4FA1", newPerDay:40 },
   schimpf:  { label:"🤬 Schimpfen",ready:"Schimpf-Ready",  color:"#C2410C", newPerDay:15 },
   flirt:    { label:"💘 Flirt",    ready:"Charme-Ready",   color:"#C2418F", newPerDay:15 },
+  musik:    { label:"🎹 Musik",    ready:"Musik-Ready",    color:"#0E7490", newPerDay:20 },
   regeln:   { label:"🔤 Regeln",   ready:"Regel-Ready",    color:"#1F7A4D", newPerDay:12 }
 };
 
@@ -276,6 +277,7 @@ const KE = (id,f,g,p,cog) => ({ ...v(id,f,g,p,"Englisch-Brücke","kognaten"),   
 const KD = (id,f,g,p,cog) => ({ ...v(id,f,g,p,"Deutsch-Brücke","kognaten"),    cog });
 const SW = (id,f,g,p,c) => v(id,f,g,p,c,"schimpf");
 const FL = (id,f,g,p,c) => v(id,f,g,p,c,"flirt");
+const MU = (id,f,g,p,c) => v(id,f,g,p,c,"musik");
 
 const SEED = [
   /* ================= STAPEL 1: URLAUB (id 1–180) ================= */
@@ -1105,7 +1107,81 @@ const SEED = [
   FL(996,"Tu veux rester dormir ?","Willst du zum Schlafen hierbleiben?","tü wö räs-te dor-mir","Danach"),
   FL(997,"Je te prépare un petit-déjeuner ?","Mach ich dir Frühstück?","schö tö pre-par äng pö-ti-de-schö-ne","Danach"),
   FL(998,"On se revoit quand ?","Wann sehen wir uns wieder?","ong ßö rö-wo-a kang","Danach"),
-  FL(999,"J'ai hâte de te revoir","Ich kann es kaum erwarten, dich wiederzusehen","sche at dö tö rö-wo-ar","Danach")
+  FL(999,"J'ai hâte de te revoir","Ich kann es kaum erwarten, dich wiederzusehen","sche at dö tö rö-wo-ar","Danach"),
+
+  /* ================= STAPEL 8: MUSIK & KLAVIER (id 1000–1069) =================
+     Vom Instrument über den Unterricht (Lehrer-Schüler-Dialog) und die
+     Musiktheorie bis zum Gespräch über klassische Musik.              */
+  MU(1000,"le piano","das Klavier","pja-no","Instrument"),
+  MU(1001,"jouer du piano","Klavier spielen","schu-e dü pja-no","Instrument"),
+  MU(1002,"le piano à queue","der Flügel","pja-no a kö","Instrument"),
+  MU(1003,"le clavier","die Klaviatur / Tastatur","kla-wje","Instrument"),
+  MU(1004,"la touche","die Taste","tusch","Instrument"),
+  MU(1005,"la pédale","das Pedal","pe-dal","Instrument"),
+  MU(1006,"la corde","die Saite","kord","Instrument"),
+  MU(1007,"accorder le piano","das Klavier stimmen","a-kor-de lö pja-no","Instrument"),
+  MU(1008,"le tabouret de piano","der Klavierhocker","ta-bu-rä dö pja-no","Instrument"),
+  MU(1009,"la partition","das Notenblatt / die Noten","par-ti-ßjong","Instrument"),
+  MU(1010,"lire les notes","Noten lesen","lir le not","Instrument"),
+  MU(1011,"une note","eine Note / ein Ton","ün not","Instrument"),
+  MU(1012,"un accord","ein Akkord","äng-na-kor","Instrument"),
+  MU(1013,"la gamme","die Tonleiter","gam","Instrument"),
+  MU(1014,"faire des gammes","Tonleitern üben","fär de gam","Instrument"),
+  MU(1015,"la main droite / la main gauche","die rechte / linke Hand","mäng dro-at / mäng gosch","Instrument"),
+  MU(1016,"à deux mains","mit beiden Händen","a dö mäng","Instrument"),
+  MU(1017,"le doigté","der Fingersatz","do-a-te","Instrument"),
+  MU(1018,"par cœur","auswendig","par kör","Instrument"),
+  MU(1019,"jouer par cœur","auswendig spielen","schu-e par kör","Instrument"),
+  MU(1020,"le cours de piano","die Klavierstunde","kur dö pja-no","Unterricht"),
+  MU(1021,"le professeur / la professeure de piano","der Klavierlehrer / die Klavierlehrerin","pro-fä-ßör dö pja-no","Unterricht"),
+  MU(1022,"l'élève","der Schüler / die Schülerin","le-läw","Unterricht"),
+  MU(1023,"s'exercer / travailler un morceau","üben / an einem Stück arbeiten","ßäg-sär-ße / tra-wa-je äng mor-ßo","Unterricht"),
+  MU(1024,"répéter","wiederholen / proben","re-pe-te","Unterricht"),
+  MU(1025,"Encore une fois, s'il te plaît","Noch einmal, bitte","ang-kor ün fo-a, ßil tö plä","Unterricht"),
+  MU(1026,"Plus lentement","Langsamer","plü langt-mang","Unterricht"),
+  MU(1027,"Plus vite","Schneller","plü wit","Unterricht"),
+  MU(1028,"le métronome","das Metronom","me-tro-nom","Unterricht"),
+  MU(1029,"le tempo","das Tempo","täng-po","Unterricht"),
+  MU(1030,"la mesure","der Takt","mö-sür","Unterricht"),
+  MU(1031,"battre la mesure","den Takt schlagen","batr la mö-sür","Unterricht"),
+  MU(1032,"Tu fais des progrès","Du machst Fortschritte","tü fä de pro-grä","Unterricht"),
+  MU(1033,"Ce passage est difficile","Diese Stelle ist schwierig","ßö pa-ßasch ä di-fi-ßil","Unterricht"),
+  MU(1034,"Recommence depuis le début","Fang von vorne an","rö-ko-mangß dö-pwi lö de-bü","Unterricht"),
+  MU(1035,"Détends tes mains","Entspann deine Hände","de-tang te mäng","Unterricht"),
+  MU(1036,"Tiens-toi droit(e)","Sitz gerade","tjäng to-a dro-a(t)","Unterricht"),
+  MU(1037,"J'ai joué faux","Ich habe falsch gespielt","sche schu-e fo","Unterricht"),
+  MU(1038,"juste / faux","richtig (sauber) / falsch","schüst / fo","Unterricht"),
+  MU(1039,"la leçon / les devoirs","die Lektion / die Übungsaufgaben","lö-ßong / le dö-wo-ar","Unterricht"),
+  MU(1040,"majeur / mineur","Dur / Moll","ma-schör / mi-nör","Theorie"),
+  MU(1041,"le dièse / le bémol","das Kreuz (♯) / das B (♭)","djäs / be-mol","Theorie"),
+  MU(1042,"la clé de sol / la clé de fa","der Violinschlüssel / der Bassschlüssel","kle dö ßol / kle dö fa","Theorie"),
+  MU(1043,"do, ré, mi, fa, sol, la, si","c, d, e, f, g, a, h (Solmisation!)","do, re, mi, fa, ßol, la, ßi","Theorie"),
+  MU(1044,"la mélodie","die Melodie","me-lo-di","Theorie"),
+  MU(1045,"l'harmonie","die Harmonie","lar-mo-ni","Theorie"),
+  MU(1046,"fort / doucement","laut / leise","for / duß-mang","Theorie"),
+  MU(1047,"le silence / la pause","die Pause (in den Noten)","ßi-langß / pos","Theorie"),
+  MU(1048,"la musique classique","die klassische Musik","mü-sik kla-ßik","Klassik & Gespräch"),
+  MU(1049,"le compositeur / la compositrice","der Komponist / die Komponistin","kong-po-si-tör / kong-po-si-triss","Klassik & Gespräch"),
+  MU(1050,"une symphonie","eine Sinfonie","ßäng-fo-ni","Klassik & Gespräch"),
+  MU(1051,"un concerto","ein (Solo-)Konzert (Werkgattung)","kong-ßär-to","Klassik & Gespräch"),
+  MU(1052,"une sonate","eine Sonate","ßo-nat","Klassik & Gespräch"),
+  MU(1053,"un morceau","ein Stück","äng mor-ßo","Klassik & Gespräch"),
+  MU(1054,"une œuvre","ein Werk","ün öwr","Klassik & Gespräch"),
+  MU(1055,"l'orchestre","das Orchester","lor-kästr","Klassik & Gespräch"),
+  MU(1056,"le chef d'orchestre","der Dirigent","schäf dor-kästr","Klassik & Gespräch"),
+  MU(1057,"aller au concert","ins Konzert gehen","a-le o kong-ßär","Klassik & Gespräch"),
+  MU(1058,"l'opéra","die Oper","lo-pe-ra","Klassik & Gespräch"),
+  MU(1059,"Quel est ton compositeur préféré ?","Wer ist dein Lieblingskomponist?","kä-lä tong kong-po-si-tör pre-fe-re","Klassik & Gespräch"),
+  MU(1060,"J'adore Chopin et Debussy","Ich liebe Chopin und Debussy","scha-dor scho-päng e dö-bü-ßi","Klassik & Gespräch"),
+  MU(1061,"interpréter un morceau","ein Stück interpretieren","äng-tär-pre-te äng mor-ßo","Klassik & Gespräch"),
+  MU(1062,"la répétition","die Probe","re-pe-ti-ßjong","Klassik & Gespräch"),
+  MU(1063,"le récital","der Klavierabend / das Solokonzert","re-ßi-tal","Klassik & Gespräch"),
+  MU(1064,"les applaudissements","der Applaus","le-sa-plo-diss-mang","Klassik & Gespräch"),
+  MU(1065,"C'était magnifique !","Das war wunderbar!","ße-tä man-ji-fik","Klassik & Gespräch"),
+  MU(1066,"Ça me donne des frissons","Das gibt mir Gänsehaut","ßa mö don de fri-ßong","Klassik & Gespräch"),
+  MU(1067,"jouer avec émotion","mit Gefühl spielen","schu-e a-wäk e-mo-ßjong","Klassik & Gespräch"),
+  MU(1068,"le public","das Publikum","lö pü-blik","Klassik & Gespräch"),
+  MU(1069,"improviser","improvisieren","äng-pro-wi-se","Klassik & Gespräch")
 ];
 
 /* =====================================================================
