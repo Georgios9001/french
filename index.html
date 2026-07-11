@@ -282,6 +282,9 @@ const DECKS = {
   schimpf:  { label:"🤬 Schimpfen",ready:"Schimpf-Ready",  color:"#C2410C", newPerDay:15 },
   flirt:    { label:"💘 Flirt",    ready:"Charme-Ready",   color:"#C2418F", newPerDay:15 },
   musik:    { label:"🎹 Musik",    ready:"Musik-Ready",    color:"#0E7490", newPerDay:20 },
+  woerter:  { label:"📚 Wörter 300",ready:"Wortschatz-Ready",color:"#4D7C0F", newPerDay:35 },
+  saetze:   { label:"🗨️ Sätze 300", ready:"Satz-Ready",     color:"#475569", newPerDay:30 },
+  verben:   { label:"🔀 Verben",   ready:"Verb-Ready",     color:"#A21CAF", newPerDay:5 },
   regeln:   { label:"🔤 Regeln",   ready:"Regel-Ready",    color:"#1F7A4D", newPerDay:12 }
 };
 
@@ -305,6 +308,9 @@ const KD = (id,f,g,p,cog) => ({ ...v(id,f,g,p,"Deutsch-Brücke","kognaten"),    
 const SW = (id,f,g,p,c) => v(id,f,g,p,c,"schimpf");
 const FL = (id,f,g,p,c) => v(id,f,g,p,c,"flirt");
 const MU = (id,f,g,p,c) => v(id,f,g,p,c,"musik");
+const W3 = (id,f,g,p,c) => v(id,f,g,p,c,"woerter");
+const S3 = (id,f,g,p,c) => v(id,f,g,p,c,"saetze");
+const VB = (id,f,g,p,c) => v(id,f,g,p,c,"verben");
 
 const SEED = [
   /* ================= STAPEL 1: URLAUB (id 1–180) ================= */
@@ -1208,7 +1214,440 @@ const SEED = [
   MU(1066,"Ça me donne des frissons","Das gibt mir Gänsehaut","ßa mö don de fri-ßong","Klassik & Gespräch"),
   MU(1067,"jouer avec émotion","mit Gefühl spielen","schu-e a-wäk e-mo-ßjong","Klassik & Gespräch"),
   MU(1068,"le public","das Publikum","lö pü-blik","Klassik & Gespräch"),
-  MU(1069,"improviser","improvisieren","äng-pro-wi-se","Klassik & Gespräch")
+  MU(1069,"improviser","improvisieren","äng-pro-wi-se","Klassik & Gespräch"),
+
+  /* ================= STAPEL 9: WÖRTER 300 (id 1100–1299) =================
+     Frequenz-Aufbaustufe: die Ränge ~101–300, ergänzend zum
+     ⭐-Top-200-Stapel (der die Ränge 1–100 abdeckt).               */
+  W3(1100,"appeler","rufen / anrufen","ap-le","Verben"),
+  W3(1101,"regarder","anschauen","rö-gar-de","Verben"),
+  W3(1102,"écouter","zuhören","e-ku-te","Verben"),
+  W3(1103,"entendre","hören","ang-tangdr","Verben"),
+  W3(1104,"laisser","lassen","lä-ße","Verben"),
+  W3(1105,"porter","tragen","por-te","Verben"),
+  W3(1106,"montrer","zeigen","mong-tre","Verben"),
+  W3(1107,"commencer","anfangen","ko-mang-ße","Verben"),
+  W3(1108,"finir","beenden","fi-nir","Verben"),
+  W3(1109,"continuer","weitermachen","kong-ti-nü-e","Verben"),
+  W3(1110,"ouvrir","öffnen","u-wrir","Verben"),
+  W3(1111,"fermer","schließen","fär-me","Verben"),
+  W3(1112,"lire","lesen","lir","Verben"),
+  W3(1113,"écrire","schreiben","e-krir","Verben"),
+  W3(1114,"répondre","antworten","re-pongdr","Verben"),
+  W3(1115,"vivre","leben","wiwr","Verben"),
+  W3(1116,"mourir","sterben","mu-rir","Verben"),
+  W3(1117,"tenir","halten","tö-nir","Verben"),
+  W3(1118,"suivre","folgen","ßüiwr","Verben"),
+  W3(1119,"revenir","zurückkommen","rö-wö-nir","Verben"),
+  W3(1120,"rentrer","heimkehren","rang-tre","Verben"),
+  W3(1121,"tomber","fallen","tong-be","Verben"),
+  W3(1122,"monter","hinaufgehen / einsteigen","mong-te","Verben"),
+  W3(1123,"descendre","hinuntergehen / aussteigen","de-ßangdr","Verben"),
+  W3(1124,"courir","rennen","ku-rir","Verben"),
+  W3(1125,"dormir","schlafen","dor-mir","Verben"),
+  W3(1126,"boire","trinken","bo-ar","Verben"),
+  W3(1127,"manger","essen","mang-sche","Verben"),
+  W3(1128,"acheter","kaufen","asch-te","Verben"),
+  W3(1129,"vendre","verkaufen","wangdr","Verben"),
+  W3(1130,"payer","bezahlen","pä-je","Verben"),
+  W3(1131,"perdre","verlieren","pärdr","Verben"),
+  W3(1132,"gagner","gewinnen / verdienen","gan-je","Verben"),
+  W3(1133,"jouer","spielen","schu-e","Verben"),
+  W3(1134,"marcher","gehen / funktionieren","mar-sche","Verben"),
+  W3(1135,"travailler","arbeiten","tra-wa-je","Verben"),
+  W3(1136,"apprendre","lernen","a-prangdr","Verben"),
+  W3(1137,"étudier","studieren","e-tü-dje","Verben"),
+  W3(1138,"oublier","vergessen","u-bli-e","Verben"),
+  W3(1139,"changer","ändern / wechseln","schang-sche","Verben"),
+  W3(1140,"aider","helfen","ä-de","Verben"),
+  W3(1141,"essayer","versuchen","ä-ßä-je","Verben"),
+  W3(1142,"expliquer","erklären","äx-pli-ke","Verben"),
+  W3(1143,"envoyer","schicken","ang-wo-a-je","Verben"),
+  W3(1144,"recevoir","bekommen","rö-ßö-wo-ar","Verben"),
+  W3(1145,"apporter","mitbringen","a-por-te","Verben"),
+  W3(1146,"garder","behalten / bewahren","gar-de","Verben"),
+  W3(1147,"quitter","verlassen","ki-te","Verben"),
+  W3(1148,"décider","entscheiden","de-ßi-de","Verben"),
+  W3(1149,"devenir","werden","dö-wö-nir","Verben"),
+  W3(1150,"servir","dienen / servieren","ßär-wir","Verben"),
+  W3(1151,"sentir","fühlen / riechen","ßang-tir","Verben"),
+  W3(1152,"toucher","berühren","tu-sche","Verben"),
+  W3(1153,"rire","lachen","rir","Verben"),
+  W3(1154,"pleurer","weinen","plö-re","Verben"),
+  W3(1155,"chanter","singen","schang-te","Verben"),
+  W3(1156,"conduire","fahren (steuern)","kong-dwir","Verben"),
+  W3(1157,"se lever","aufstehen","ßö lö-we","Verben"),
+  W3(1158,"s'asseoir","sich setzen","ßa-ßo-ar","Verben"),
+  W3(1159,"se coucher","schlafen gehen","ßö ku-sche","Verben"),
+  W3(1160,"les gens","die Leute","le schang","Mensch & Körper"),
+  W3(1161,"le garçon / la fille","der Junge / das Mädchen","gar-ßong / fij","Mensch & Körper"),
+  W3(1162,"le mari / la femme","der Ehemann / die Ehefrau","ma-ri / fam","Mensch & Körper"),
+  W3(1163,"le fils / la fille","der Sohn / die Tochter","fiss / fij","Mensch & Körper"),
+  W3(1164,"le corps","der Körper","kor","Mensch & Körper"),
+  W3(1165,"le bras","der Arm","bra","Mensch & Körper"),
+  W3(1166,"la jambe","das Bein","schangb","Mensch & Körper"),
+  W3(1167,"le pied","der Fuß","pje","Mensch & Körper"),
+  W3(1168,"le dos","der Rücken","do","Mensch & Körper"),
+  W3(1169,"le visage","das Gesicht","wi-sasch","Mensch & Körper"),
+  W3(1170,"la bouche","der Mund","busch","Mensch & Körper"),
+  W3(1171,"la dent","der Zahn","dang","Mensch & Körper"),
+  W3(1172,"les cheveux","die Haare","le schö-wö","Mensch & Körper"),
+  W3(1173,"l'oreille","das Ohr","lo-räj","Mensch & Körper"),
+  W3(1174,"le nez","die Nase","ne","Mensch & Körper"),
+  W3(1175,"la voix","die Stimme","wo-a","Mensch & Körper"),
+  W3(1176,"le cœur","das Herz","kör","Mensch & Körper"),
+  W3(1177,"le sang","das Blut","ßang","Mensch & Körper"),
+  W3(1178,"la santé","die Gesundheit","ßang-te","Mensch & Körper"),
+  W3(1179,"la maladie","die Krankheit","ma-la-di","Mensch & Körper"),
+  W3(1180,"le médecin","der Arzt","med-ßäng","Mensch & Körper"),
+  W3(1181,"la peau","die Haut","po","Mensch & Körper"),
+  W3(1182,"l'épaule","die Schulter","le-pol","Mensch & Körper"),
+  W3(1183,"le ventre","der Bauch","wangtr","Mensch & Körper"),
+  W3(1184,"le doigt","der Finger","do-a","Mensch & Körper"),
+  W3(1185,"le ciel","der Himmel","ßjäl","Welt & Natur"),
+  W3(1186,"le soleil","die Sonne","ßo-läj","Welt & Natur"),
+  W3(1187,"la lune","der Mond","lün","Welt & Natur"),
+  W3(1188,"l'étoile","der Stern","le-to-al","Welt & Natur"),
+  W3(1189,"la mer","das Meer","mär","Welt & Natur"),
+  W3(1190,"la montagne","der Berg","mong-tann-jö","Welt & Natur"),
+  W3(1191,"la forêt","der Wald","fo-rä","Welt & Natur"),
+  W3(1192,"l'arbre","der Baum","larbr","Welt & Natur"),
+  W3(1193,"la fleur","die Blume","flör","Welt & Natur"),
+  W3(1194,"la terre","die Erde","tär","Welt & Natur"),
+  W3(1195,"le feu","das Feuer","fö","Welt & Natur"),
+  W3(1196,"l'air","die Luft","lär","Welt & Natur"),
+  W3(1197,"la pierre","der Stein","pjär","Welt & Natur"),
+  W3(1198,"le bois","das Holz / das Wäldchen","bo-a","Welt & Natur"),
+  W3(1199,"la pluie","der Regen","plwi","Welt & Natur"),
+  W3(1200,"la neige","der Schnee","näsch","Welt & Natur"),
+  W3(1201,"le vent","der Wind","wang","Welt & Natur"),
+  W3(1202,"l'hiver / l'été","der Winter / der Sommer","li-wär / le-te","Welt & Natur"),
+  W3(1203,"le printemps / l'automne","der Frühling / der Herbst","präng-tang / lo-ton","Welt & Natur"),
+  W3(1204,"le nord / le sud","der Norden / der Süden","nor / ßüd","Welt & Natur"),
+  W3(1205,"l'est / l'ouest","der Osten / der Westen","läst / lu-äst","Welt & Natur"),
+  W3(1206,"la route","die Landstraße","rut","Welt & Natur"),
+  W3(1207,"le chemin","der Weg","schö-mäng","Welt & Natur"),
+  W3(1208,"le champ","das Feld","schang","Welt & Natur"),
+  W3(1209,"l'oiseau","der Vogel","lo-a-so","Welt & Natur"),
+  W3(1210,"la porte","die Tür","port","Alltag"),
+  W3(1211,"la fenêtre","das Fenster","fö-nätr","Alltag"),
+  W3(1212,"la chaise","der Stuhl","schäs","Alltag"),
+  W3(1213,"le lit","das Bett","li","Alltag"),
+  W3(1214,"la cuisine","die Küche","kwi-sin","Alltag"),
+  W3(1215,"le jardin","der Garten","schar-däng","Alltag"),
+  W3(1216,"la voiture","das Auto","wo-a-tür","Alltag"),
+  W3(1217,"l'argent","das Geld","lar-schang","Alltag"),
+  W3(1218,"le prix","der Preis","pri","Alltag"),
+  W3(1219,"l'école","die Schule","le-kol","Alltag"),
+  W3(1220,"le livre","das Buch","liwr","Alltag"),
+  W3(1221,"le journal","die Zeitung","schur-nal","Alltag"),
+  W3(1222,"la lettre","der Brief","lätr","Alltag"),
+  W3(1223,"l'image","das Bild","li-masch","Alltag"),
+  W3(1224,"le jeu","das Spiel","schö","Alltag"),
+  W3(1225,"la chanson","das Lied","schang-ßong","Alltag"),
+  W3(1226,"la fête","das Fest / die Party","fät","Alltag"),
+  W3(1227,"le cadeau","das Geschenk","ka-do","Alltag"),
+  W3(1228,"la bouteille","die Flasche","bu-täj","Alltag"),
+  W3(1229,"l'assiette","der Teller","la-ßjät","Alltag"),
+  W3(1230,"le couteau / la fourchette","das Messer / die Gabel","ku-to / fur-schät","Alltag"),
+  W3(1231,"la cuillère","der Löffel","kwi-jär","Alltag"),
+  W3(1232,"le vêtement","das Kleidungsstück","wät-mang","Alltag"),
+  W3(1233,"la chaussure","der Schuh","scho-ßür","Alltag"),
+  W3(1234,"le chapeau","der Hut","scha-po","Alltag"),
+  W3(1235,"la poche","die Hosentasche","posch","Alltag"),
+  W3(1236,"la lumière","das Licht","lü-mjär","Alltag"),
+  W3(1237,"l'ombre","der Schatten","longbr","Alltag"),
+  W3(1238,"le bruit","der Lärm / das Geräusch","brwi","Alltag"),
+  W3(1239,"le chien / le chat","der Hund / die Katze","schjäng / scha","Alltag"),
+  W3(1240,"le mot","das Wort","mo","Abstrakt"),
+  W3(1241,"le nom","der Name","nong","Abstrakt"),
+  W3(1242,"la raison","der Grund / die Vernunft","rä-song","Abstrakt"),
+  W3(1243,"le besoin","das Bedürfnis","bö-so-äng","Abstrakt"),
+  W3(1244,"l'envie","die Lust","lang-wi","Abstrakt"),
+  W3(1245,"la peur","die Angst","pör","Abstrakt"),
+  W3(1246,"la joie","die Freude","scho-a","Abstrakt"),
+  W3(1247,"la colère","die Wut","ko-lär","Abstrakt"),
+  W3(1248,"l'espoir","die Hoffnung","läs-po-ar","Abstrakt"),
+  W3(1249,"le rêve","der Traum","räw","Abstrakt"),
+  W3(1250,"la vérité","die Wahrheit","we-ri-te","Abstrakt"),
+  W3(1251,"le mensonge","die Lüge","mang-ßongsch","Abstrakt"),
+  W3(1252,"le regard","der Blick","rö-gar","Abstrakt"),
+  W3(1253,"la larme","die Träne","larm","Abstrakt"),
+  W3(1254,"la force","die Kraft","forß","Abstrakt"),
+  W3(1255,"la guerre / la paix","der Krieg / der Frieden","gär / pä","Abstrakt"),
+  W3(1256,"la mort","der Tod","mor","Abstrakt"),
+  W3(1257,"l'amour","die Liebe","la-mur","Abstrakt"),
+  W3(1258,"l'amitié","die Freundschaft","la-mi-tje","Abstrakt"),
+  W3(1259,"le début / la fin","der Anfang / das Ende","de-bü / fäng","Abstrakt"),
+  W3(1260,"le côté","die Seite","ko-te","Abstrakt"),
+  W3(1261,"l'endroit","der Ort","lang-dro-a","Abstrakt"),
+  W3(1262,"la pièce","das Zimmer / das Stück","pjäss","Abstrakt"),
+  W3(1263,"le numéro","die Nummer","nü-me-ro","Abstrakt"),
+  W3(1264,"la partie","der Teil","par-ti","Abstrakt"),
+  W3(1265,"le groupe","die Gruppe","grup","Abstrakt"),
+  W3(1266,"la façon / la manière","die Art und Weise","fa-ßong / ma-njär","Abstrakt"),
+  W3(1267,"l'exemple","das Beispiel","läg-sangpl","Abstrakt"),
+  W3(1268,"l'instant","der Augenblick","läng-stang","Abstrakt"),
+  W3(1269,"le mois","der Monat","mo-a","Abstrakt"),
+  W3(1270,"bon / mauvais","gut / schlecht","bong / mo-wä","Adjektive"),
+  W3(1271,"beau / joli","schön / hübsch","bo / scho-li","Adjektive"),
+  W3(1272,"jeune / vieux","jung / alt","schön / wjö","Adjektive"),
+  W3(1273,"nouveau / ancien","neu / ehemalig","nu-wo / ang-ßjäng","Adjektive"),
+  W3(1274,"premier / dernier","erste(r) / letzte(r)","prö-mje / där-nje","Adjektive"),
+  W3(1275,"haut / bas","hoch / niedrig","o / ba","Adjektive"),
+  W3(1276,"long / court","lang / kurz","long / kur","Adjektive"),
+  W3(1277,"gros / mince","dick / dünn","gro / mängß","Adjektive"),
+  W3(1278,"fort / faible","stark / schwach","for / fäbl","Adjektive"),
+  W3(1279,"plein / vide","voll / leer","pläng / wid","Adjektive"),
+  W3(1280,"propre / sale","sauber / schmutzig","propr / ßal","Adjektive"),
+  W3(1281,"riche / pauvre","reich / arm","risch / powr","Adjektive"),
+  W3(1282,"heureux / malheureux","glücklich / unglücklich","ö-rö / ma-lö-rö","Adjektive"),
+  W3(1283,"seul","allein","ßöl","Adjektive"),
+  W3(1284,"libre / occupé","frei / besetzt","libr / o-kü-pe","Adjektive"),
+  W3(1285,"prêt","bereit","prä","Adjektive"),
+  W3(1286,"meilleur / pire","besser / schlimmer","mä-jör / pir","Adjektive"),
+  W3(1287,"prochain","nächste(r)","pro-schäng","Adjektive"),
+  W3(1288,"blanc / noir","weiß / schwarz","blang / no-ar","Adjektive"),
+  W3(1289,"rouge / vert / jaune","rot / grün / gelb","rusch / wär / schon","Adjektive"),
+  W3(1290,"vraiment","wirklich","wrä-mang","Adverbien & Co"),
+  W3(1291,"seulement","nur","ßöl-mang","Adverbien & Co"),
+  W3(1292,"surtout","vor allem","ßür-tu","Adverbien & Co"),
+  W3(1293,"presque","fast","präsk","Adverbien & Co"),
+  W3(1294,"assez","genug / ziemlich","a-ße","Adverbien & Co"),
+  W3(1295,"ensemble","zusammen","ang-ßangbl","Adverbien & Co"),
+  W3(1296,"souvent / parfois","oft / manchmal","ßu-wang / par-fo-a","Adverbien & Co"),
+  W3(1297,"d'abord / ensuite / enfin","zuerst / danach / schließlich","da-bor / ang-ßwit / ang-fäng","Adverbien & Co"),
+  W3(1298,"parce que","weil","parß-kö","Adverbien & Co"),
+  W3(1299,"pendant / depuis","während / seit","pang-dang / dö-pwi","Adverbien & Co"),
+
+  /* ================= STAPEL 10: SÄTZE 300 (id 1300–1499) =================
+     200 weitere hochfrequente gesprochene Sätze – Aufbaustufe zu den
+     100 Sätzen im ⭐-Top-200-Stapel.                                 */
+  S3(1300,"Qu'est-ce qui t'arrive ?","Was ist mit dir los?","käs-ki ta-riw","Nachfragen"),
+  S3(1301,"Tout le monde est là ?","Sind alle da?","tul-mongd ä la","Nachfragen"),
+  S3(1302,"Il n'y a personne","Es ist niemand da","il nja pär-ßonn","Nachfragen"),
+  S3(1303,"Il y a quelqu'un ?","Ist da jemand?","il-ja käl-käng","Nachfragen"),
+  S3(1304,"J'arrive tout de suite","Ich komme sofort","scha-riw tut-ßwit","Zeit"),
+  S3(1305,"Une seconde !","Eine Sekunde!","ün ßö-gongd","Zeit"),
+  S3(1306,"Prends ton temps","Lass dir Zeit","prang tong tang","Zeit"),
+  S3(1307,"On est en retard","Wir sind spät dran","o-nä-tang rö-tar","Zeit"),
+  S3(1308,"Dépêchons-nous !","Beeilen wir uns!","de-pä-schong nu","Zeit"),
+  S3(1309,"Ce n'est pas la peine","Das ist nicht nötig","ßö nä pa la pän","Bewertung"),
+  S3(1310,"Ça vaut la peine","Das lohnt sich","ßa wo la pän","Bewertung"),
+  S3(1311,"C'est gentil de ta part","Das ist nett von dir","ßä schang-ti dö ta par","Höflichkeit"),
+  S3(1312,"Je te remercie","Ich danke dir","schö tö rö-mär-ßi","Höflichkeit"),
+  S3(1313,"Il n'y a pas de quoi","Keine Ursache","il nja pa dö ko-a","Höflichkeit"),
+  S3(1314,"Je vous en prie","Bitte sehr (förmlich)","schö wu-sang pri","Höflichkeit"),
+  S3(1315,"Après vous","Nach Ihnen","a-prä wu","Höflichkeit"),
+  S3(1316,"Faites comme chez vous","Fühlen Sie sich wie zu Hause","fät kom sche wu","Höflichkeit"),
+  S3(1317,"Ça ne me regarde pas","Das geht mich nichts an","ßa nö mö rö-gard pa","Meinung"),
+  S3(1318,"Ça ne te regarde pas","Das geht dich nichts an","ßa nö tö rö-gard pa","Meinung"),
+  S3(1319,"C'est la vie","So ist das Leben","ßä la wi","Lebensweisheit"),
+  S3(1320,"C'est comme ça","So ist das nun mal","ßä kom ßa","Lebensweisheit"),
+  S3(1321,"On ne sait jamais","Man weiß nie","ong nö ßä scha-mä","Lebensweisheit"),
+  S3(1322,"Tout est possible","Alles ist möglich","tu-tä po-ßibl","Lebensweisheit"),
+  S3(1323,"J'en suis sûr","Da bin ich mir sicher","schang ßwi ßür","Sicherheit"),
+  S3(1324,"Je n'en suis pas sûr","Da bin ich mir nicht sicher","schö nang ßwi pa ßür","Sicherheit"),
+  S3(1325,"Tu es sûr ?","Bist du sicher?","tü ä ßür","Sicherheit"),
+  S3(1326,"Sans doute","Wahrscheinlich","ßang dut","Sicherheit"),
+  S3(1327,"Bien entendu","Selbstverständlich","bjäng-nang-tang-dü","Zustimmung"),
+  S3(1328,"Pas question !","Kommt nicht in Frage!","pa käs-tjong","Ablehnung"),
+  S3(1329,"Jamais de la vie !","Nie im Leben!","scha-mä dö la wi","Ablehnung"),
+  S3(1330,"Pourquoi pas ?","Warum nicht?","pur-ko-a pa","Zustimmung"),
+  S3(1331,"Ça dépend de toi","Das hängt von dir ab","ßa de-pang dö to-a","Meinung"),
+  S3(1332,"Comme d'habitude","Wie immer","kom da-bi-tüd","Zeit"),
+  S3(1333,"De temps en temps","Ab und zu","dö tang-sang-tang","Zeit"),
+  S3(1334,"Tout à coup","Plötzlich","tu-ta-ku","Zeit"),
+  S3(1335,"Tout de suite","Sofort","tut-ßwit","Zeit"),
+  S3(1336,"En ce moment","Im Moment / zurzeit","ang ßö mo-mang","Zeit"),
+  S3(1337,"Il est trop tôt","Es ist zu früh","i-lä tro to","Zeit"),
+  S3(1338,"Il est trop tard","Es ist zu spät","i-lä tro tar","Zeit"),
+  S3(1339,"Il est temps de partir","Es ist Zeit zu gehen","i-lä tang dö par-tir","Zeit"),
+  S3(1340,"On a le temps","Wir haben Zeit","o-na lö tang","Zeit"),
+  S3(1341,"Le temps passe vite","Die Zeit vergeht schnell","lö tang pass wit","Zeit"),
+  S3(1342,"À quoi tu penses ?","Woran denkst du?","a ko-a tü pangß","Nachfragen"),
+  S3(1343,"Je réfléchis","Ich denke nach","schö re-fle-schi","Denken"),
+  S3(1344,"Laisse-moi réfléchir","Lass mich nachdenken","läss mo-a re-fle-schir","Denken"),
+  S3(1345,"J'ai changé d'avis","Ich habe meine Meinung geändert","sche schang-sche da-wi","Denken"),
+  S3(1346,"C'est une bonne question","Das ist eine gute Frage","ßä-tün bon käs-tjong","Denken"),
+  S3(1347,"Je me demande…","Ich frage mich…","schö mö dö-mangd","Denken"),
+  S3(1348,"Ça n'a pas de sens","Das ergibt keinen Sinn","ßa na pa dö ßangß","Denken"),
+  S3(1349,"Ça a du sens","Das ergibt Sinn","ßa a dü ßangß","Denken"),
+  S3(1350,"Tu exagères !","Du übertreibst!","tü äg-sa-schär","Reaktion"),
+  S3(1351,"Ce n'est pas juste","Das ist nicht fair","ßö nä pa schüst","Reaktion"),
+  S3(1352,"Tu plaisantes ?","Machst du Witze?","tü plä-sangt","Reaktion"),
+  S3(1353,"Sans blague !","Ohne Witz! / Echt jetzt!","ßang blag","Reaktion"),
+  S3(1354,"Arrête !","Hör auf!","a-rät","Aufforderung"),
+  S3(1355,"Vas-y !","Los! / Mach schon!","wa-si","Aufforderung"),
+  S3(1356,"Allez !","Los! / Komm schon!","a-le","Aufforderung"),
+  S3(1357,"Courage !","Kopf hoch!","ku-rasch","Ermutigung"),
+  S3(1358,"Ne t'inquiète pas","Mach dir keine Sorgen","nö täng-kjät pa","Ermutigung"),
+  S3(1359,"Ne t'en fais pas","Mach dir nichts draus","nö tang fä pa","Ermutigung"),
+  S3(1360,"Calme-toi","Beruhig dich","kalm to-a","Ermutigung"),
+  S3(1361,"Détends-toi","Entspann dich","de-tang to-a","Ermutigung"),
+  S3(1362,"Tout ira bien","Alles wird gut","tu-ti-ra bjäng","Ermutigung"),
+  S3(1363,"Ça va aller","Das wird schon","ßa wa a-le","Ermutigung"),
+  S3(1364,"Ce n'est rien","Das ist nichts / halb so wild","ßö nä ri-äng","Ermutigung"),
+  S3(1365,"J'ai eu peur !","Ich habe mich erschreckt!","sche ü pör","Gefühle"),
+  S3(1366,"Quelle horreur !","Wie schrecklich!","käl o-rör","Gefühle"),
+  S3(1367,"Quel bonheur !","Was für ein Glück!","käl bo-nör","Gefühle"),
+  S3(1368,"J'ai de la chance","Ich habe Glück","sche dö la schangß","Gefühle"),
+  S3(1369,"Pas de chance !","Pech gehabt!","pa dö schangß","Gefühle"),
+  S3(1370,"Bonne continuation !","Weiterhin viel Erfolg!","bon kong-ti-nü-a-ßjong","Wünsche"),
+  S3(1371,"Meilleurs vœux !","Beste Wünsche!","mä-jör wö","Wünsche"),
+  S3(1372,"À votre santé !","Auf Ihr Wohl!","a wotr ßang-te","Wünsche"),
+  S3(1373,"Je suis fier de toi","Ich bin stolz auf dich","schö ßwi fjär dö to-a","Lob"),
+  S3(1374,"Bien joué !","Gut gemacht!","bjäng schu-e","Lob"),
+  S3(1375,"Bravo !","Bravo!","bra-wo","Lob"),
+  S3(1376,"C'est exactement ça","Genau das ist es","ßä äg-sak-tö-mang ßa","Zustimmung"),
+  S3(1377,"Tu as tout compris","Du hast alles verstanden","tü a tu kong-pri","Lob"),
+  S3(1378,"Je n'ai rien compris","Ich habe nichts verstanden","schö ne ri-äng kong-pri","Verstehen"),
+  S3(1379,"Répète, s'il te plaît","Wiederhol das bitte","re-pät ßil tö plä","Verstehen"),
+  S3(1380,"Comment ça s'écrit ?","Wie schreibt man das?","ko-mang ßa ße-kri","Verstehen"),
+  S3(1381,"Tu peux l'épeler ?","Kannst du das buchstabieren?","tü pö le-pö-le","Verstehen"),
+  S3(1382,"Qu'est-ce que tu as dit ?","Was hast du gesagt?","käs-kö tü a di","Verstehen"),
+  S3(1383,"J'ai une question","Ich habe eine Frage","sche ün käs-tjong","Nachfragen"),
+  S3(1384,"Je peux te poser une question ?","Darf ich dir eine Frage stellen?","schö pö tö po-se ün käs-tjong","Nachfragen"),
+  S3(1385,"Bien sûr, vas-y","Klar, leg los","bjäng ßür, wa-si","Zustimmung"),
+  S3(1386,"Dis-le-moi","Sag es mir","di lö mo-a","Aufforderung"),
+  S3(1387,"Je te le promets","Ich verspreche es dir","schö tö lö pro-mä","Vertrauen"),
+  S3(1388,"C'est promis","Versprochen","ßä pro-mi","Vertrauen"),
+  S3(1389,"Fais-moi confiance","Vertrau mir","fä mo-a kong-fjangß","Vertrauen"),
+  S3(1390,"Je te crois","Ich glaube dir","schö tö kro-a","Vertrauen"),
+  S3(1391,"Je ne te crois pas","Ich glaube dir nicht","schö nö tö kro-a pa","Vertrauen"),
+  S3(1392,"Tu mens !","Du lügst!","tü mang","Vertrauen"),
+  S3(1393,"Je dis la vérité","Ich sage die Wahrheit","schö di la we-ri-te","Vertrauen"),
+  S3(1394,"Sois honnête","Sei ehrlich","ßo-a o-nät","Vertrauen"),
+  S3(1395,"Entre nous…","Unter uns…","angtr nu","Vertrauen"),
+  S3(1396,"Garde le secret","Behalte es für dich","gard lö ßö-krä","Vertrauen"),
+  S3(1397,"Ne le dis à personne","Sag es niemandem","nö lö di a pär-ßonn","Vertrauen"),
+  S3(1398,"Qu'est-ce que tu en sais ?","Was weißt du schon davon?","käs-kö tü ang ßä","Nachfragen"),
+  S3(1399,"Aucune idée","Keine Ahnung","o-kün i-de","Wissen"),
+  S3(1400,"Va savoir !","Wer weiß!","wa ßa-wo-ar","Wissen"),
+  S3(1401,"On verra bien","Wir werden ja sehen","ong wä-ra bjäng","Wissen"),
+  S3(1402,"Ça se voit","Das sieht man","ßa ßö wo-a","Wissen"),
+  S3(1403,"Ça s'entend","Das hört man","ßa ßang-tang","Wissen"),
+  S3(1404,"Il paraît que oui","Anscheinend ja","il pa-rä kö wi","Wissen"),
+  S3(1405,"C'est évident","Das ist offensichtlich","ßä-te-wi-dang","Wissen"),
+  S3(1406,"Au fait…","Übrigens…","o fät","Gesprächsfluss"),
+  S3(1407,"À propos…","Apropos…","a pro-po","Gesprächsfluss"),
+  S3(1408,"En fait…","Eigentlich…","ang fät","Gesprächsfluss"),
+  S3(1409,"De toute façon","Sowieso / jedenfalls","dö tut fa-ßong","Gesprächsfluss"),
+  S3(1410,"Quand même !","Trotzdem! / Immerhin!","kang mäm","Gesprächsfluss"),
+  S3(1411,"Malgré tout","Trotz allem","mal-gre tu","Gesprächsfluss"),
+  S3(1412,"Par contre…","Andererseits…","par kongtr","Gesprächsfluss"),
+  S3(1413,"En plus…","Außerdem…","ang plüss","Gesprächsfluss"),
+  S3(1414,"Par exemple","Zum Beispiel","par äg-sangpl","Gesprächsfluss"),
+  S3(1415,"C'est-à-dire…","Das heißt…","ßä-ta-dir","Gesprächsfluss"),
+  S3(1416,"Autrement dit","Anders gesagt","otr-mang di","Gesprächsfluss"),
+  S3(1417,"Grosso modo","Grob gesagt","gro-ßo mo-do","Gesprächsfluss"),
+  S3(1418,"Plus ou moins","Mehr oder weniger","plü-su-mo-äng","Gesprächsfluss"),
+  S3(1419,"À peu près","Ungefähr","a pö prä","Gesprächsfluss"),
+  S3(1420,"Pas tout à fait","Nicht ganz","pa tu-ta-fä","Gesprächsfluss"),
+  S3(1421,"Exactement !","Genau!","äg-sak-tö-mang","Zustimmung"),
+  S3(1422,"Absolument !","Absolut!","ab-ßo-lü-mang","Zustimmung"),
+  S3(1423,"Effectivement","In der Tat","e-fäk-tiw-mang","Zustimmung"),
+  S3(1424,"Évidemment","Natürlich / offensichtlich","e-wi-da-mang","Zustimmung"),
+  S3(1425,"Franchement…","Ehrlich gesagt…","frang-schö-mang","Gesprächsfluss"),
+  S3(1426,"Honnêtement…","Ganz ehrlich…","o-nät-mang","Gesprächsfluss"),
+  S3(1427,"Entre parenthèses","Nebenbei bemerkt","angtr pa-rang-täs","Gesprächsfluss"),
+  S3(1428,"Bref, passons","Kurzum, weiter im Text","bräf, pa-ßong","Gesprächsfluss"),
+  S3(1429,"Revenons à nos moutons","Zurück zum Thema (wörtl.: zu unseren Schafen!)","rö-wö-nong a no mu-tong","Gesprächsfluss"),
+  S3(1430,"Où en étais-je ?","Wo war ich stehengeblieben?","u ang-ne-tä schö","Gesprächsfluss"),
+  S3(1431,"J'ai perdu le fil","Ich habe den Faden verloren","sche pär-dü lö fil","Gedächtnis"),
+  S3(1432,"Ça me dit quelque chose","Das kommt mir bekannt vor","ßa mö di käl-kö schos","Gedächtnis"),
+  S3(1433,"Ça ne me dit rien","Das sagt mir nichts","ßa nö mö di ri-äng","Gedächtnis"),
+  S3(1434,"J'ai un trou de mémoire","Ich habe gerade ein Blackout","sche äng tru dö me-mo-ar","Gedächtnis"),
+  S3(1435,"Ça m'est sorti de la tête","Das ist mir entfallen","ßa mä ßor-ti dö la tät","Gedächtnis"),
+  S3(1436,"Je m'en souviendrai","Das werde ich mir merken","schö mang ßu-wjäng-dre","Gedächtnis"),
+  S3(1437,"N'oublie pas !","Vergiss es nicht!","nu-bli pa","Gedächtnis"),
+  S3(1438,"Rappelle-moi ce soir","Ruf mich heute Abend zurück","ra-päl mo-a ßö ßo-ar","Telefon"),
+  S3(1439,"Je te rappelle","Ich rufe dich zurück","schö tö ra-päl","Telefon"),
+  S3(1440,"Ne quittez pas","Bleiben Sie dran","nö ki-te pa","Telefon"),
+  S3(1441,"C'est de la part de qui ?","Wer ist am Apparat?","ßä dö la par dö ki","Telefon"),
+  S3(1442,"Vous vous êtes trompé de numéro","Sie haben sich verwählt","wu wu-sät trong-pe dö nü-me-ro","Telefon"),
+  S3(1443,"La ligne est occupée","Die Leitung ist besetzt","la linn-jö ä-to-kü-pe","Telefon"),
+  S3(1444,"Je n'ai plus de batterie","Mein Akku ist leer","schö ne plü dö bat-ri","Telefon"),
+  S3(1445,"Tu m'entends ?","Hörst du mich?","tü mang-tang","Telefon"),
+  S3(1446,"Je t'entends mal","Ich höre dich schlecht","schö tang-tang mal","Telefon"),
+  S3(1447,"Ça a coupé","Die Verbindung ist abgebrochen","ßa a ku-pe","Telefon"),
+  S3(1448,"Envoie-moi la photo","Schick mir das Foto","ang-wo-a mo-a la fo-to","Telefon"),
+  S3(1449,"Je t'envoie l'adresse","Ich schicke dir die Adresse","schö tang-wo-a la-dräss","Telefon"),
+  S3(1450,"On se retrouve où ?","Wo treffen wir uns?","ong ßö rö-truw u","Verabredung"),
+  S3(1451,"Rendez-vous à huit heures","Treffen um acht Uhr","rang-de-wu a üi-tör","Verabredung"),
+  S3(1452,"Je passe te chercher","Ich hole dich ab","schö pass tö schär-sche","Verabredung"),
+  S3(1453,"Je te dépose ?","Soll ich dich absetzen?","schö tö de-pos","Unterwegs"),
+  S3(1454,"Monte !","Steig ein!","mongt","Unterwegs"),
+  S3(1455,"Attache ta ceinture","Schnall dich an","a-tasch ta ßäng-tür","Unterwegs"),
+  S3(1456,"On est arrivés","Wir sind da","o-nä-ta-ri-we","Unterwegs"),
+  S3(1457,"Encore combien de temps ?","Wie lange noch?","ang-kor kong-bjäng dö tang","Unterwegs"),
+  S3(1458,"On est presque arrivés","Wir sind fast da","o-nä präsk a-ri-we","Unterwegs"),
+  S3(1459,"Je meurs de faim","Ich sterbe vor Hunger","schö mör dö fäng","Essen"),
+  S3(1460,"Je meurs de soif","Ich sterbe vor Durst","schö mör dö ßo-af","Essen"),
+  S3(1461,"J'ai trop mangé","Ich habe zu viel gegessen","sche tro mang-sche","Essen"),
+  S3(1462,"C'était très bon","Es war sehr lecker","ße-tä trä bong","Essen"),
+  S3(1463,"Tu veux goûter ?","Willst du probieren?","tü wö gu-te","Essen"),
+  S3(1464,"Sers-toi !","Bedien dich!","ßär to-a","Essen"),
+  S3(1465,"Il n'y a plus de pain","Es gibt kein Brot mehr","il nja plü dö päng","Essen"),
+  S3(1466,"On fait les courses ?","Gehen wir einkaufen?","ong fä le kurß","Haushalt"),
+  S3(1467,"J'ai fait une liste","Ich habe eine Liste gemacht","sche fä ün list","Haushalt"),
+  S3(1468,"Il ne manque rien","Es fehlt nichts","il nö mangk ri-äng","Haushalt"),
+  S3(1469,"Qu'est-ce qui manque ?","Was fehlt?","käs-ki mangk","Haushalt"),
+  S3(1470,"C'est fermé le lundi","Montags ist geschlossen","ßä fär-me lö läng-di","Haushalt"),
+  S3(1471,"On y va à pied ?","Gehen wir zu Fuß?","o-ni-wa a pje","Unterwegs"),
+  S3(1472,"C'est à deux pas d'ici","Das ist gleich um die Ecke","ßä-ta dö pa di-ßi","Unterwegs"),
+  S3(1473,"Je me suis trompé de rue","Ich habe die falsche Straße erwischt","schö mö ßwi trong-pe dö rü","Unterwegs"),
+  S3(1474,"Suis-moi","Folg mir","ßwi mo-a","Aufforderung"),
+  S3(1475,"Passe devant","Geh vor","pass dö-wang","Aufforderung"),
+  S3(1476,"Fais gaffe !","Pass bloß auf! (umg.)","fä gaf","Aufforderung"),
+  S3(1477,"Doucement !","Vorsichtig! / Langsam!","duß-mang","Aufforderung"),
+  S3(1478,"Ne bouge pas","Beweg dich nicht","nö busch pa","Aufforderung"),
+  S3(1479,"Lève-toi","Steh auf","läw to-a","Aufforderung"),
+  S3(1480,"Assieds-toi","Setz dich","a-ßje to-a","Aufforderung"),
+  S3(1481,"Entre !","Komm rein!","angtr","Zuhause"),
+  S3(1482,"Ferme la porte","Mach die Tür zu","färm la port","Zuhause"),
+  S3(1483,"Ouvre la fenêtre","Öffne das Fenster","uwr la fö-nätr","Zuhause"),
+  S3(1484,"Éteins la lumière","Mach das Licht aus","e-täng la lü-mjär","Zuhause"),
+  S3(1485,"Allume la télé","Mach den Fernseher an","a-lüm la te-le","Zuhause"),
+  S3(1486,"Baisse le son","Mach leiser","bäss lö ßong","Zuhause"),
+  S3(1487,"J'ai sommeil, je vais me coucher","Ich bin müde, ich gehe ins Bett","sche ßo-mäj, schö wä mö ku-sche","Schlafen"),
+  S3(1488,"Dors bien","Schlaf gut","dor bjäng","Schlafen"),
+  S3(1489,"Fais de beaux rêves","Träum was Schönes","fä dö bo räw","Schlafen"),
+  S3(1490,"Tu as bien dormi ?","Hast du gut geschlafen?","tü a bjäng dor-mi","Schlafen"),
+  S3(1491,"Je n'ai pas fermé l'œil","Ich habe kein Auge zugetan","schö ne pa fär-me löj","Schlafen"),
+  S3(1492,"Quel jour on est ?","Welcher Tag ist heute?","käl schur o-nä","Zeit"),
+  S3(1493,"C'est quand, ton anniversaire ?","Wann hast du Geburtstag?","ßä kang, to-na-ni-wär-ßär","Nachfragen"),
+  S3(1494,"Le temps de me préparer","Nur kurz fertig machen","lö tang dö mö pre-pa-re","Zeit"),
+  S3(1495,"Je suis prêt","Ich bin bereit","schö ßwi prä","Zeit"),
+  S3(1496,"On y est presque","Fast geschafft","o-ni-ä präsk","Ermutigung"),
+  S3(1497,"C'est fini","Es ist vorbei / fertig","ßä fi-ni","Abschluss"),
+  S3(1498,"On a réussi !","Wir haben es geschafft!","o-na re-ü-ßi","Abschluss"),
+  S3(1499,"Mission accomplie !","Mission erfüllt!","mi-ßjong a-kong-pli","Abschluss"),
+
+  /* ================= STAPEL 11: TOP-20-VERBEN (id 1500–1519) =================
+     Die 20 häufigsten Verben, vollständig konjugiert im Präsens
+     (je, tu, il/elle, nous, vous, ils/elles).
+     Vorderseite = deutsche Aufgabe · Rückseite = alle sechs Formen.  */
+  VB(1500,"être : je suis, tu es, il/elle est, nous sommes, vous êtes, ils/elles sont","sein — Präsens: ich, du, er/sie, wir, ihr/Sie, sie","ßwi · ä · ä · ßom · ät · ßong","Unregelmäßig"),
+  VB(1501,"avoir : j'ai, tu as, il a, nous avons, vous avez, ils ont","haben — Präsens","sche · a · a · a-wong · a-we · ong (Liaison: il-song!)","Unregelmäßig"),
+  VB(1502,"faire : je fais, tu fais, il fait, nous faisons, vous faites, ils font","machen — Präsens","fä · fä · fä · fö-song · fät · fong","Unregelmäßig"),
+  VB(1503,"aller : je vais, tu vas, il va, nous allons, vous allez, ils vont","gehen — Präsens","wä · wa · wa · a-long · a-le · wong","Unregelmäßig"),
+  VB(1504,"dire : je dis, tu dis, il dit, nous disons, vous dites, ils disent","sagen — Präsens","di · di · di · di-song · dit · dis","Unregelmäßig"),
+  VB(1505,"pouvoir : je peux, tu peux, il peut, nous pouvons, vous pouvez, ils peuvent","können — Präsens","pö · pö · pö · pu-wong · pu-we · pöw","Unregelmäßig"),
+  VB(1506,"voir : je vois, tu vois, il voit, nous voyons, vous voyez, ils voient","sehen — Präsens","wo-a · wo-a · wo-a · wo-a-jong · wo-a-je · wo-a","Unregelmäßig"),
+  VB(1507,"savoir : je sais, tu sais, il sait, nous savons, vous savez, ils savent","wissen — Präsens","ßä · ßä · ßä · ßa-wong · ßa-we · ßaw","Unregelmäßig"),
+  VB(1508,"vouloir : je veux, tu veux, il veut, nous voulons, vous voulez, ils veulent","wollen — Präsens","wö · wö · wö · wu-long · wu-le · wöl","Unregelmäßig"),
+  VB(1509,"venir : je viens, tu viens, il vient, nous venons, vous venez, ils viennent","kommen — Präsens","wjäng · wjäng · wjäng · wö-nong · wö-ne · wjänn","Unregelmäßig"),
+  VB(1510,"devoir : je dois, tu dois, il doit, nous devons, vous devez, ils doivent","müssen — Präsens","do-a · do-a · do-a · dö-wong · dö-we · do-aw","Unregelmäßig"),
+  VB(1511,"prendre : je prends, tu prends, il prend, nous prenons, vous prenez, ils prennent","nehmen — Präsens","prang · prang · prang · prö-nong · prö-ne · pränn","Unregelmäßig"),
+  VB(1512,"mettre : je mets, tu mets, il met, nous mettons, vous mettez, ils mettent","legen/stellen — Präsens","mä · mä · mä · mä-tong · mä-te · mät","Unregelmäßig"),
+  VB(1513,"donner : je donne, tu donnes, il donne, nous donnons, vous donnez, ils donnent","geben — Präsens (Muster für ALLE -er-Verben!)","don · don · don · do-nong · do-ne · don","-er regelmäßig"),
+  VB(1514,"trouver : je trouve, tu trouves, il trouve, nous trouvons, vous trouvez, ils trouvent","finden — Präsens","truw · truw · truw · tru-wong · tru-we · truw","-er regelmäßig"),
+  VB(1515,"parler : je parle, tu parles, il parle, nous parlons, vous parlez, ils parlent","sprechen — Präsens","parl · parl · parl · par-long · par-le · parl","-er regelmäßig"),
+  VB(1516,"aimer : j'aime, tu aimes, il aime, nous aimons, vous aimez, ils aiment","lieben/mögen — Präsens","schäm · äm · äm · ä-mong · ä-me · äm (Liaison: il-säm)","-er regelmäßig"),
+  VB(1517,"croire : je crois, tu crois, il croit, nous croyons, vous croyez, ils croient","glauben — Präsens","kro-a · kro-a · kro-a · kro-a-jong · kro-a-je · kro-a","Unregelmäßig"),
+  VB(1518,"comprendre : je comprends, tu comprends, il comprend, nous comprenons, vous comprenez, ils comprennent","verstehen — Präsens (wie prendre!)","kong-prang · kong-prang · kong-prang · kong-prö-nong · kong-prö-ne · kong-pränn","Unregelmäßig"),
+  VB(1519,"falloir : il faut (nur 3. Person!) · il ne faut pas","nötig sein / man muss — Sonderfall: existiert NUR als „il faut“","il fo · il nö fo pa","Sonderfall")
 ];
 
 /* =====================================================================
@@ -1688,6 +2127,7 @@ function renderNav(){
   }
   html += `<button class="nav-btn view-btn ${state.view==="stats"?"active":""}" data-view="stats">📈 Statistik</button>`;
   html += `<button class="nav-btn view-btn ${state.view==="guide"?"active":""}" data-view="guide">📖 Aussprache</button>`;
+  html += `<button class="nav-btn view-btn ${state.view==="grammar"?"active":""}" data-view="grammar">📗 Grammatik</button>`;
   navEl.innerHTML = html;
   navEl.querySelectorAll("[data-deck]").forEach(b => b.addEventListener("click", () => {
     convo = null;
@@ -1709,6 +2149,7 @@ function renderAll(){
   updateConvoLaunch();
   if (state.view === "stats") { renderStats(); return; }
   if (state.view === "guide") { renderGuide(); return; }
+  if (state.view === "grammar") { renderGrammar(); return; }
   if (convo) { renderConvo(); return; }
   render();
 }
@@ -1915,6 +2356,102 @@ function renderStats(){
       </div>
     </div>`;
   stage.innerHTML = `<div class="guide" style="padding-top:4px">${html}</div>`;
+}
+
+/* ---------- Grammatik-Guide: die 10 wichtigsten Regeln ---------- */
+function renderGrammar(){
+  stage.innerHTML = `<div class="guide" style="padding-top:4px">
+
+  <div class="panel">
+    <h3>1️⃣ Die Verneinung ist ein Sandwich: ne … pas</h3>
+    <p>Das Verb wird von <b>ne</b> und <b>pas</b> umklammert: Je <b>ne</b> comprends <b>pas</b>
+    <span class="ph">[schö nö kong-prang pa]</span>. Gesprochen lassen Franzosen das „ne" fast
+    immer weg: <i>Je sais pas</i> → <span class="ph">[schä pa]</span>. Fürs Hören ist also
+    das <b>pas</b> dein Verneinungs-Signal, nicht das ne.</p>
+  </div>
+
+  <div class="panel">
+    <h3>2️⃣ Jedes Nomen hat ein Geschlecht – lerne es mit dem Artikel</h3>
+    <p><b>le</b> (m), <b>la</b> (w), <b>les</b> (Mz.) · unbestimmt: <b>un / une / des</b>.
+    Dazu der Teilungsartikel für „etwas von": <b>du pain</b> (etwas Brot),
+    <b>de l'eau</b> (etwas Wasser). Merke: Nie „le" oder „la" isoliert nachlernen –
+    immer <i>la table, le livre</i> als Einheit speichern (genau so sind die Karten gebaut).</p>
+  </div>
+
+  <div class="panel">
+    <h3>3️⃣ Adjektive stehen meist HINTER dem Nomen</h3>
+    <p>le vin <b>rouge</b>, une idée <b>intéressante</b> – umgekehrt zum Deutschen.
+    Nur eine Handvoll sehr häufiger Adjektive steht davor (Merkhilfe „BANGS":
+    Beauty, Age, Number, Goodness, Size): un <b>bon</b> restaurant, une <b>grande</b> maison,
+    un <b>petit</b> café. Adjektive passen sich an: petit → petit<b>e</b> (w) → petit<b>s</b> (Mz.).</p>
+  </div>
+
+  <div class="panel">
+    <h3>4️⃣ Fragen: drei Wege, einer reicht</h3>
+    <p><b>a)</b> Stimme heben: Tu viens ? <span class="ph">[tü wjäng?]</span> –
+    im Alltag der häufigste Weg. <b>b)</b> <b>Est-ce que</b> davorsetzen:
+    Est-ce que tu viens ? <b>c)</b> Inversion (förmlich): Viens-tu ?
+    Für den Anfang: Weg a) zum Sprechen, Weg b) zum Erkennen –
+    <span class="ph">[äs-kö]</span> am Satzanfang = „hier kommt eine Frage".</p>
+  </div>
+
+  <div class="panel">
+    <h3>5️⃣ Vergangenheit: avoir/être + Partizip (passé composé)</h3>
+    <p>Wie im Deutschen „ich habe gegessen": J'<b>ai</b> mangé · Tu <b>as</b> vu · Nous <b>avons</b> fini.
+    Bewegungs- und Zustandsverben nehmen <b>être</b>: Je <b>suis</b> allé(e)
+    <span class="ph">[schö ßwi a-le]</span>, il <b>est</b> parti. Hör-Trick: „ä/e-Laut am
+    Verbende nach avoir/être" = Vergangenheit (mangé, allé, fini, parti).</p>
+  </div>
+
+  <div class="panel">
+    <h3>6️⃣ Zukunft für Faule: aller + Infinitiv</h3>
+    <p>Genau wie Englisch „going to": Je <b>vais</b> manger (ich werde gleich essen)
+    <span class="ph">[schö wä mang-sche]</span> · On <b>va</b> voir (wir werden sehen).
+    Damit deckst du 90 % aller Zukunfts-Situationen ab, ohne je das echte Futur zu lernen.</p>
+  </div>
+
+  <div class="panel">
+    <h3>7️⃣ Pronomen springen VOR das Verb</h3>
+    <p>„Ich sehe dich" → Je <b>te</b> vois. „Ich liebe dich" → Je <b>t'</b>aime.
+    „Ich nehme es" → Je <b>le</b> prends. Fürs Hörverstehen entscheidend:
+    Das kleine Wort direkt vor dem Verb (me, te, le, la, nous, vous, les)
+    ist das Objekt – <span class="ph">[schö tö wo-a]</span> = ich · dich · sehe.</p>
+  </div>
+
+  <div class="panel">
+    <h3>8️⃣ tu oder vous? Die Höflichkeits-Weiche</h3>
+    <p><b>vous</b> = Sie (und ihr): für Fremde, Ältere, Bedienung, Beamte – im Zweifel IMMER vous.
+    <b>tu</b> = du: Freunde, Familie, Kinder, beim Flirten. Der Wechsel wird angeboten:
+    „On se tutoie ?" <span class="ph">[ong ßö tü-to-a]</span>. Faustregel für den Urlaub:
+    Du sprichst Menschen mit vous an, sie dich vielleicht mit tu – das ist okay.</p>
+  </div>
+
+  <div class="panel">
+    <h3>9️⃣ Die drei Alleskönner: il y a · c'est · il faut</h3>
+    <p><b>Il y a</b> = es gibt: Il y a un problème <span class="ph">[il-ja]</span>.
+    <b>C'est</b> = das ist: C'est bon, c'est loin, c'est combien ?
+    <b>Il faut</b> = man muss / nötig ist: Il faut réserver <span class="ph">[il fo]</span>.
+    Mit diesen drei unpersönlichen Formeln + Nomen baust du hunderte Sätze,
+    ohne ein einziges Verb konjugieren zu müssen.</p>
+  </div>
+
+  <div class="panel">
+    <h3>🔟 Ein Präsens für alles</h3>
+    <p>Das französische Präsens erledigt drei deutsche Zeiten auf einmal:
+    <b>Je mange</b> = ich esse · ich esse gerade · ich esse gleich.
+    Es gibt keine Verlaufsform wie im Englischen. Zusammen mit Regel 5 (Vergangenheit)
+    und Regel 6 (Zukunft) brauchst du am Anfang also genau DREI Zeitformen –
+    und die 20 Verben aus dem 🔀-Stapel decken den Rest ab.</p>
+    <button class="ghost-btn" id="toVerbs" style="margin-top:14px;width:100%">
+      🔀 Die Top-20-Verben jetzt als Karten üben
+    </button>
+  </div>
+
+  </div>`;
+  const gbtn = document.getElementById("toVerbs");
+  if (gbtn) gbtn.addEventListener("click", () => {
+    state.activeDeck = "verben"; state.view = "learn"; saveState(); renderAll();
+  });
 }
 
 /* ---------- Aussprache-Guide ---------- */
